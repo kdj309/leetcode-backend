@@ -1,4 +1,10 @@
-import { IsEmail, IsEnum, IsNotEmpty, MinLength } from 'class-validator';
+import {
+  IsAlphanumeric,
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  MinLength,
+} from 'class-validator';
 
 export class createUser {
   @MinLength(5)
@@ -8,6 +14,10 @@ export class createUser {
   @IsNotEmpty()
   @IsEmail()
   email: string;
+
+  @MinLength(8)
+  @IsNotEmpty()
+  password: string;
 
   solvedproblems: string[];
 

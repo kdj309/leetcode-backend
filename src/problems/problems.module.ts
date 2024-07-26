@@ -12,7 +12,5 @@ import { ProblemsService } from './problems.service';
   providers: [ProblemsService],
 })
 export class ProblemsModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    
-  }
+  configure(consumer: MiddlewareConsumer) {}
 }

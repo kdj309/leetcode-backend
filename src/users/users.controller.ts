@@ -4,10 +4,8 @@ import {
   Get,
   Param,
   Post,
-  Put,
   Delete,
   NotFoundException,
-  ParseIntPipe,
   ValidationPipe,
   Patch,
 } from '@nestjs/common';

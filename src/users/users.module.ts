@@ -8,7 +8,6 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, Userschema } from 'src/Schemas/user.schema';
-import { ObjectIdValidationMiddleware } from 'src/middlewares/objectid.validation';
 
 @Module({
   imports: [
@@ -16,11 +15,6 @@ import { ObjectIdValidationMiddleware } from 'src/middlewares/objectid.validatio
   ],
   providers: [UsersService],
   controllers: [UsersController],
+  exports: [UsersService],
 })
-export class UsersModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(ObjectIdValidationMiddleware)
-      .forRoutes({ path: 'users:id', method: RequestMethod.GET });
-  }
-}
+export class UsersModule {}
