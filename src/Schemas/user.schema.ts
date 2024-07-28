@@ -4,9 +4,10 @@ import * as mongoose from 'mongoose';
 import { Problem } from './problem.schema';
 import * as bcrypt from 'bcrypt';
 import { Role } from 'src/enums/roles.enum';
+import { commonLanguages } from '../constants/index';
 
 export type UserDocument = HydratedDocument<User>;
-const commonLanguages = ['Java', 'Python', 'JavaScript', 'C++', 'C'];
+
 @Schema()
 export class User {
   _password: string;
@@ -24,12 +25,13 @@ export class User {
   solvedproblems: Problem[];
 
   @Prop({ type: String, enum: commonLanguages })
-  favoriteProgrammingLanguage: string;
+  favoriteProgrammingLanguage: { id: number; name: string };
 
   @Prop({ default: [] })
   submissions: {
     problemId: mongoose.Schema.Types.ObjectId;
     submissionId: string;
+    languageId: string;
     status: string;
     submittedAt: Date;
   }[];
