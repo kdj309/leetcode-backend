@@ -3,6 +3,7 @@ import { HydratedDocument } from 'mongoose';
 import * as mongoose from 'mongoose';
 import { Problem } from './problem.schema';
 import * as bcrypt from 'bcrypt';
+import { Role } from 'src/enums/roles.enum';
 
 export type UserDocument = HydratedDocument<User>;
 const commonLanguages = ['Java', 'Python', 'JavaScript', 'C++', 'C'];
@@ -35,6 +36,9 @@ export class User {
 
   @Prop()
   hashedpassword: string;
+
+  @Prop({ default: Role.User })
+  roles: Role[];
 
   securePassword(passsword: string) {
     return bcrypt.hashSync(passsword, 10);

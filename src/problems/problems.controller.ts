@@ -7,16 +7,23 @@ import {
   Param,
   Delete,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { ProblemsService } from './problems.service';
 import { CreateProblemDto } from './dto/create-problem.dto';
 import { UpdateProblemDto } from './dto/update-problem.dto';
+import { Roles } from 'src/roles/roles.decorator';
+import { Role } from 'src/enums/roles.enum';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { RolesGaurd } from 'src/roles/roles.guard';
 
 @Controller('problems')
 export class ProblemsController {
   constructor(private readonly problemsService: ProblemsService) {}
 
-  @Post()
+  @UseGuards(AuthGuard, RolesGaurd)
+  @Post('createProblem/:userId')
+  @Roles(Role.Admin)
   create(@Body() createProblemDto: CreateProblemDto) {
     return this.problemsService.create(createProblemDto);
   }
@@ -26,6 +33,7 @@ export class ProblemsController {
     return this.problemsService.findAll();
   }
 
+  @UseGuards(AuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     const problem = this.problemsService.findOne(+id);
@@ -36,12 +44,16 @@ export class ProblemsController {
     }
   }
 
-  @Patch(':id')
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGaurd)
+  @Patch(':id/:userId')
   update(@Param('id') id: string, @Body() updateProblemDto: UpdateProblemDto) {
     return this.problemsService.update(+id, updateProblemDto);
   }
 
-  @Delete(':id')
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGaurd)
+  @Delete(':id/:userId')
   remove(@Param('id') id: string) {
     return this.problemsService.remove(+id);
   }

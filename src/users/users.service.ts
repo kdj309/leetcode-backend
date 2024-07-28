@@ -13,7 +13,7 @@ export class UsersService {
     return await this.userModel.find();
   }
 
-  async getUser(id: number) {
+  async getUser(id: string) {
     const user = await this.userModel.findById(id);
     if (user) {
       return user;

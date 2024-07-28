@@ -8,10 +8,15 @@ import {
   NotFoundException,
   ValidationPipe,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { createUser } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user-dto';
+import { Roles } from 'src/roles/roles.decorator';
+import { Role } from 'src/enums/roles.enum';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { RolesGaurd } from 'src/roles/roles.guard';
 
 @Controller('users')
 export class UsersController {
@@ -21,8 +26,9 @@ export class UsersController {
     return this.userSrvice.getAllUsers();
   }
 
+  @UseGuards(AuthGuard)
   @Get(':id')
-  getUser(@Param('id') id: number) {
+  getUser(@Param('id') id: string) {
     try {
       return this.userSrvice.getUser(id);
     } catch (error) {
@@ -36,6 +42,7 @@ export class UsersController {
     return this.userSrvice.createUser(newUser);
   }
 
+  @UseGuards(AuthGuard)
   @Patch(':id')
   updateUser(
     @Param('id') id: number,
@@ -48,7 +55,9 @@ export class UsersController {
     }
   }
 
-  @Delete(':id')
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGaurd)
+  @Delete(':id/:userId')
   deleteUser(@Param('id') id: number) {
     try {
       return this.userSrvice.deleteUser(id);
