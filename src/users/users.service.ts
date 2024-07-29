@@ -4,10 +4,14 @@ import { UpdateUserDto } from './dto/update-user-dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/Schemas/user.schema';
 import { Model } from 'mongoose';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    private jwtService: JwtService,
+  ) {}
 
   async getAllUsers() {
     return await this.userModel.find();
@@ -34,8 +38,12 @@ export class UsersService {
     const user = await this.userModel.findOne({ email: userData.email });
     if (!user) {
       const newuser = new this.userModel(userData);
+      const payload = { sub: newuser.id, username: newuser.username };
       await newuser.save();
-      return 'User Created Successfully';
+      return {
+        message: 'User Created Successfully',
+        access_token: await this.jwtService.signAsync(payload),
+      };
     } else {
       return 'User Already Exists';
     }

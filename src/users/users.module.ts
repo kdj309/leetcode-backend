@@ -9,10 +9,17 @@ import { UsersService } from './users.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, Userschema } from 'src/Schemas/user.schema';
 import { GetUserByIdMiddleware } from 'src/middlewares/get-user-by-id.middleware';
+import { JwtModule } from '@nestjs/jwt';
+import { jwtConstants } from 'src/auth/constants';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: Userschema }]),
+    JwtModule.register({
+      global: true,
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: '24h' },
+    }),
   ],
   providers: [UsersService],
   controllers: [UsersController],
