@@ -24,19 +24,19 @@ export class ProblemsController {
   @UseGuards(AuthGuard, RolesGaurd)
   @Post('createProblem/:userId')
   @Roles(Role.Admin)
-  create(@Body() createProblemDto: CreateProblemDto) {
-    return this.problemsService.create(createProblemDto);
+  async create(@Body() createProblemDto: CreateProblemDto) {
+    return await this.problemsService.create(createProblemDto);
   }
 
   @Get()
-  findAll() {
-    return this.problemsService.findAll();
+  async findAll() {
+    return await this.problemsService.findAll();
   }
 
   @UseGuards(AuthGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    const problem = this.problemsService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    const problem = await this.problemsService.findOne(+id);
     if (problem) {
       return problem;
     } else {
@@ -47,14 +47,17 @@ export class ProblemsController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGaurd)
   @Patch(':id/:userId')
-  update(@Param('id') id: string, @Body() updateProblemDto: UpdateProblemDto) {
-    return this.problemsService.update(+id, updateProblemDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateProblemDto: UpdateProblemDto,
+  ) {
+    return await this.problemsService.update(+id, updateProblemDto);
   }
 
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGaurd)
   @Delete(':id/:userId')
-  remove(@Param('id') id: string) {
-    return this.problemsService.remove(+id);
+  async remove(@Param('id') id: string) {
+    return await this.problemsService.remove(+id);
   }
 }

@@ -15,3 +15,7 @@ export interface ConfigProps {
     database: MongodbConfigProps;
   };
 }
+export interface signup {
+  access_token: string;
+  message: string;
+}

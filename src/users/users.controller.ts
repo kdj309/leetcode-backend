@@ -9,6 +9,7 @@ import {
   ValidationPipe,
   Patch,
   UseGuards,
+  Res,
 } from '@nestjs/common';
 import { createUser } from './dto/create-user.dto';
 import { UsersService } from './users.service';
@@ -17,39 +18,49 @@ import { Roles } from 'src/roles/roles.decorator';
 import { Role } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGaurd } from 'src/roles/roles.guard';
+import { signup } from 'src/interfaces/config.interface';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly userSrvice: UsersService) {}
   @Get('/')
-  getUsers() {
-    return this.userSrvice.getAllUsers();
+  async getUsers() {
+    return await this.userSrvice.getAllUsers();
   }
 
   @UseGuards(AuthGuard)
   @Get(':id')
-  getUser(@Param('id') id: string) {
+  async getUser(@Param('id') id: string) {
     try {
-      return this.userSrvice.getUser(id);
+      return await this.userSrvice.getUser(id);
     } catch (error) {
       throw new NotFoundException();
     }
   }
 
   @Post('/createUser')
-  addUser(@Body(new ValidationPipe()) createUserDto: createUser) {
+  async addUser(
+    @Body(new ValidationPipe()) createUserDto: createUser,
+    @Res({ passthrough: true }) response: Response,
+  ) {
     const newUser = createUserDto;
-    return this.userSrvice.createUser(newUser);
+    //@ts-ignore
+    const usermessage: signup = await this.userSrvice.createUser(newUser);
+    //@ts-ignore
+    response.cookie('access-token', usermessage.access_token, {
+      httpOnly: true,
+    });
+    return usermessage.message;
   }
 
   @UseGuards(AuthGuard)
   @Patch(':id')
-  updateUser(
+  async updateUser(
     @Param('id') id: number,
     @Body(new ValidationPipe()) updateUserBody: UpdateUserDto,
   ) {
     try {
-      return this.userSrvice.updateUser(id, updateUserBody);
+      return await this.userSrvice.updateUser(id, updateUserBody);
     } catch (error) {
       throw new NotFoundException();
     }
@@ -58,9 +69,9 @@ export class UsersController {
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGaurd)
   @Delete(':id/:userId')
-  deleteUser(@Param('id') id: number) {
+  async deleteUser(@Param('id') id: number) {
     try {
-      return this.userSrvice.deleteUser(id);
+      return await this.userSrvice.deleteUser(id);
     } catch (error) {
       throw new NotFoundException();
     }
