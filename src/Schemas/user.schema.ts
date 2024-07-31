@@ -24,7 +24,7 @@ export class User {
   })
   solvedproblems: Problem[];
 
-  @Prop({ type: String, enum: commonLanguages })
+  @Prop({ type: { id: Number, String }, enum: commonLanguages })
   favoriteProgrammingLanguage: { id: number; name: string };
 
   @Prop({ default: [] })
