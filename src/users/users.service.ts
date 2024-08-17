@@ -35,17 +35,26 @@ export class UsersService {
   }
 
   async createUser(userData: createUser) {
-    const user = await this.userModel.findOne({ email: userData.email });
-    if (!user) {
-      const newuser = new this.userModel(userData);
-      const payload = { sub: newuser.id, username: newuser.username };
-      await newuser.save();
-      return {
-        message: 'User Created Successfully',
-        access_token: await this.jwtService.signAsync(payload),
-      };
-    } else {
-      return 'User Already Exists';
+    try {
+      const user = await this.userModel.findOne({ email: userData.email });
+      if (!user) {
+        const newuser = new this.userModel(userData);
+        const payload = { sub: newuser.id, username: newuser.username };
+        await newuser.save();
+        return {
+          data: {
+            access_token: await this.jwtService.signAsync(payload),
+          },
+          message: 'User Created Successfully',
+          status: 'Success',
+        };
+      } else {
+        return 'User Already Exists';
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
     }
   }
 

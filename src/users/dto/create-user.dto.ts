@@ -1,7 +1,7 @@
 import { IsEmail, IsEnum, IsNotEmpty, MinLength } from 'class-validator';
 import { commonLanguages } from 'src/constants';
 import { Role } from 'src/enums/roles.enum';
-const supportedlanguages=commonLanguages.map((l)=>l.name)
+const supportedlanguages = commonLanguages.map((l) => l.name);
 
 export class createUser {
   @MinLength(5)
@@ -21,10 +21,8 @@ export class createUser {
   @IsEnum(['user', 'admin'])
   roles: Role[];
 
-  
   @IsEnum(supportedlanguages)
-  favoriteProgrammingLanguage:string
-
+  favoriteProgrammingLanguage: string;
 
   submissions: string[];
 }

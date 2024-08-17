@@ -10,13 +10,24 @@ export class AuthService {
   ) {}
 
   async signIn(email: string, pass: string): Promise<{ access_token: string }> {
-    const user = await this.usersService.getUserByEmail(email);
-    if (!user.authenticate(pass)) {
-      throw new UnauthorizedException();
+    try {
+      const user = await this.usersService.getUserByEmail(email);
+      if (!user.authenticate(pass)) {
+        throw new UnauthorizedException();
+      }
+      const payload = { sub: user.id, username: user.username };
+      //@ts-ignore
+      return {
+        //@ts-ignore
+        status: 'Success',
+        data: {
+          access_token: await this.jwtService.signAsync(payload),
+        },
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
     }
-    const payload = { sub: user.id, username: user.username };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
   }
 }

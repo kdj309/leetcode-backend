@@ -19,14 +19,22 @@ export class AuthController {
     @Body() signInDto: signInDto,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const authresponse = await this.authService.signIn(
-      signInDto.email,
-      signInDto.password,
-    );
-    //@ts-ignore
-    response.cookie('access-token', authresponse.access_token, {
-      httpOnly: true,
-    });
-    return authresponse;
+    try {
+      const authresponse = await this.authService.signIn(
+        signInDto.email,
+        signInDto.password,
+      );
+      //@ts-ignore
+      response.cookie('access-token', authresponse.data.access_token, {
+        httpOnly: true,
+        path: '/signin'
+      });
+      return authresponse;
+    } catch (error) {
+      return {
+        status: 'Failure',
+        error: error.message,
+      };
+    }
   }
 }

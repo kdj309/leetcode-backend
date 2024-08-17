@@ -44,13 +44,22 @@ export class UsersController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const newUser = createUserDto;
+    try {
+      //@ts-ignore
+      const usermessage: signup = await this.userSrvice.createUser(newUser);
+      //@ts-ignore
+      response.cookie('access-token', usermessage.data.access_token, {
+        httpOnly: true,
+      });
+      return usermessage;
+    } catch (error) {
+      return {
+        status: 'Failure',
+        error: error.message,
+      };
+    }
+
     //@ts-ignore
-    const usermessage: signup = await this.userSrvice.createUser(newUser);
-    //@ts-ignore
-    response.cookie('access-token', usermessage.access_token, {
-      httpOnly: true,
-    });
-    return usermessage.message;
   }
 
   @UseGuards(AuthGuard)
