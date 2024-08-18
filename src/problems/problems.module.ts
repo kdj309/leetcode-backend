@@ -24,9 +24,7 @@ export class ProblemsModule implements NestModule {
     consumer
       .apply(GetUserByIdMiddleware)
       .forRoutes(
-        { path: '/createProblem/:userId', method: RequestMethod.POST },
-        { path: '/:id/:userId', method: RequestMethod.PATCH },
-        { path: '/:id/:userId', method: RequestMethod.DELETE },
+ProblemsController
       );
   }
 }
