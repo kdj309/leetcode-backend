@@ -17,7 +17,7 @@ import { Role } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGaurd } from 'src/roles/roles.guard';
 import { ObjectId } from 'mongoose';
-import { getFailureResponse } from 'src/constants';
+import { getFailureResponse } from 'src/utils';
 
 @Controller('problems')
 export class ProblemsController {

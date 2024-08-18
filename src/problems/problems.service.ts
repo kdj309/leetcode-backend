@@ -4,7 +4,7 @@ import { UpdateProblemDto } from './dto/update-problem.dto';
 import { Problem } from 'src/Schemas/problem.schema';
 import { Model, ObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { getSuccessResponse } from 'src/constants';
+import { getSuccessResponse } from 'src/utils';
 
 @Injectable()
 export class ProblemsService {
