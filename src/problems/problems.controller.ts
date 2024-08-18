@@ -17,6 +17,7 @@ import { Role } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGaurd } from 'src/roles/roles.guard';
 import { ObjectId } from 'mongoose';
+import { getFailureResponse } from 'src/constants';
 
 @Controller('problems')
 export class ProblemsController {
@@ -26,22 +27,33 @@ export class ProblemsController {
   @Post('createProblem/:userId')
   @Roles(Role.Admin)
   async create(@Body() createProblemDto: CreateProblemDto) {
-    return await this.problemsService.create(createProblemDto);
+    try {
+      return await this.problemsService.create(createProblemDto);
+    } catch (error) {
+      if (error instanceof Error) return getFailureResponse(error.message);
+    }
   }
 
   @Get()
   async findAll() {
-    return await this.problemsService.findAll();
+    try {
+      return await this.problemsService.findAll();
+    } catch (error) {
+      if (error instanceof Error) return getFailureResponse(error.message);
+    }
   }
 
   @UseGuards(AuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: ObjectId) {
-    const problem = await this.problemsService.findOne(id);
-    if (problem) {
+    try {
+      const problem = await this.problemsService.findOne(id);
+      if (problem == -1) {
+        throw new NotFoundException();
+      }
       return problem;
-    } else {
-      throw new NotFoundException();
+    } catch (error) {
+      if (error instanceof Error) return getFailureResponse(error.message);
     }
   }
 
@@ -49,16 +61,24 @@ export class ProblemsController {
   @UseGuards(AuthGuard, RolesGaurd)
   @Patch(':id/:userId')
   async update(
-    @Param('id') id: string,
+    @Param('id') id: ObjectId,
     @Body() updateProblemDto: UpdateProblemDto,
   ) {
-    return await this.problemsService.update(+id, updateProblemDto);
+    try {
+      return await this.problemsService.update(id, updateProblemDto);
+    } catch (error) {
+      if (error instanceof Error) return getFailureResponse(error.message);
+    }
   }
 
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGaurd)
   @Delete(':id/:userId')
-  async remove(@Param('id') id: string) {
-    return await this.problemsService.remove(+id);
+  async remove(@Param('id') id: ObjectId) {
+    try {
+      return await this.problemsService.remove(id);
+    } catch (error) {
+      if (error instanceof Error) return getFailureResponse(error.message);
+    }
   }
 }

@@ -4,6 +4,7 @@ import { UpdateProblemDto } from './dto/update-problem.dto';
 import { Problem } from 'src/Schemas/problem.schema';
 import { Model, ObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { getSuccessResponse } from 'src/constants';
 
 @Injectable()
 export class ProblemsService {
@@ -11,44 +12,65 @@ export class ProblemsService {
     @InjectModel(Problem.name) private problemModule: Model<Problem>,
   ) {}
   async create(createProblemDto: CreateProblemDto) {
-    const problem = new this.problemModule(createProblemDto);
-    await problem.save();
+    try {
+      const problem = new this.problemModule(createProblemDto);
+      await problem.save();
+      return getSuccessResponse(problem, 'Problem Created Succesfully');
+    } catch (error) {
+      if (error instanceof Error) throw new Error(error.message);
+    }
+
     return 'Problem saved successfully';
   }
 
   async findAll() {
-    return await this.problemModule.find();
+    try {
+      const problems = await this.problemModule.find();
+      return getSuccessResponse(problems, 'Fetched all problems');
+    } catch (error) {
+      if (error instanceof Error) throw new Error(error.message);
+    }
   }
 
   async findOne(id: ObjectId) {
-    const problem = await this.problemModule.findById(id);
-    if (!problem) {
-      return -1;
+    try {
+      const problem = await this.problemModule.findById(id);
+      if (!problem) {
+        return -1;
+      }
+      return getSuccessResponse(problem, 'Successfully fetched the problem');
+    } catch (error) {
+      if (error instanceof Error) throw new Error(error.message);
     }
-    return problem;
   }
 
-  async update(id: number, updateProblemDto: UpdateProblemDto) {
+  async update(id: ObjectId, updateProblemDto: UpdateProblemDto) {
     try {
       const problem = await this.problemModule.findByIdAndUpdate(
         id,
         updateProblemDto,
+        {
+          new: true,
+        },
       );
       if (!problem) {
         throw new Error('Update Failed');
       }
-      return problem;
+      return getSuccessResponse(problem, 'Successfully updated the problem');
     } catch (error) {
-      return error;
+      if (error instanceof Error) throw new Error(error.message);
     }
   }
 
-  async remove(id: number) {
+  async remove(id: ObjectId) {
     try {
-      const problem = await this.problemModule.findByIdAndDelete(id);
-      return 'Problem deleted successfully';
+      const _ = await this.problemModule.findByIdAndDelete(id);
+      return getSuccessResponse(
+        `Problem ${id}`,
+        'Problem deleted successfully',
+      );
     } catch (error) {
-      return -1;
+      if (error instanceof Error) throw new Error(error.message);
     }
   }
 }

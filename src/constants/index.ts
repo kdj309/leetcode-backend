@@ -8,3 +8,16 @@ const commonLanguages = [
   { id: 92, name: 'Python' },
 ];
 export { commonLanguages };
+export const getSuccessResponse = (data: any, message: string) => {
+  return {
+    data,
+    message,
+    status: 'Success',
+  };
+};
+export const getFailureResponse = (error: string) => {
+  return {
+    status: 'Failure',
+    error: error,
+  };
+};
