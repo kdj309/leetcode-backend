@@ -16,13 +16,9 @@ export class createUser {
   @IsNotEmpty()
   password: string;
 
-  solvedproblems: string[];
-
   @IsEnum(['user', 'admin'])
   roles: Role[];
 
   @IsEnum(supportedlanguages)
   favoriteProgrammingLanguage: string;
-
-  submissions: string[];
 }

@@ -19,6 +19,7 @@ import { Role } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGaurd } from 'src/roles/roles.guard';
 import { signup } from 'src/interfaces/config.interface';
+import { ObjectId } from 'mongoose';
 
 @Controller('users')
 export class UsersController {
@@ -30,7 +31,7 @@ export class UsersController {
 
   @UseGuards(AuthGuard)
   @Get(':id')
-  async getUser(@Param('id') id: string) {
+  async getUser(@Param('id') id: ObjectId) {
     try {
       return await this.userSrvice.getUser(id);
     } catch (error) {
@@ -43,6 +44,7 @@ export class UsersController {
     @Body(new ValidationPipe()) createUserDto: createUser,
     @Res({ passthrough: true }) response: Response,
   ) {
+    console.log(createUserDto);
     const newUser = createUserDto;
     try {
       //@ts-ignore

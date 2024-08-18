@@ -27,7 +27,7 @@ export class AuthController {
       //@ts-ignore
       response.cookie('access-token', authresponse.data.access_token, {
         httpOnly: true,
-        path: '/signin'
+        path: '/signin',
       });
       return authresponse;
     } catch (error) {

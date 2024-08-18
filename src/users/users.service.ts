@@ -3,7 +3,7 @@ import { createUser } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user-dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/Schemas/user.schema';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class UsersService {
     return await this.userModel.find();
   }
 
-  async getUser(id: string) {
+  async getUser(id: ObjectId) {
     const user = await this.userModel.findById(id);
     if (user) {
       return user;
@@ -35,6 +35,7 @@ export class UsersService {
   }
 
   async createUser(userData: createUser) {
+    console.log(userData);
     try {
       const user = await this.userModel.findOne({ email: userData.email });
       if (!user) {

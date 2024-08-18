@@ -21,10 +21,19 @@ import { UsersModule } from 'src/users/users.module';
 })
 export class ProblemsModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(GetUserByIdMiddleware)
-      .forRoutes(
-ProblemsController
-      );
+    consumer.apply(GetUserByIdMiddleware).forRoutes(
+      {
+        path: 'problems/createProblem/:userId',
+        method: RequestMethod.POST,
+      },
+      {
+        path: 'problems/:id/:userId',
+        method: RequestMethod.PATCH,
+      },
+      {
+        path: 'problems/:id/:userId',
+        method: RequestMethod.DELETE,
+      },
+    );
   }
 }

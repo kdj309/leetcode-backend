@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateProblemDto } from './dto/create-problem.dto';
 import { UpdateProblemDto } from './dto/update-problem.dto';
 import { Problem } from 'src/Schemas/problem.schema';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
@@ -20,7 +20,7 @@ export class ProblemsService {
     return await this.problemModule.find();
   }
 
-  async findOne(id: number) {
+  async findOne(id: ObjectId) {
     const problem = await this.problemModule.findById(id);
     if (!problem) {
       return -1;

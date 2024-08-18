@@ -16,6 +16,7 @@ import { Roles } from 'src/roles/roles.decorator';
 import { Role } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGaurd } from 'src/roles/roles.guard';
+import { ObjectId } from 'mongoose';
 
 @Controller('problems')
 export class ProblemsController {
@@ -35,8 +36,8 @@ export class ProblemsController {
 
   @UseGuards(AuthGuard)
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const problem = await this.problemsService.findOne(+id);
+  async findOne(@Param('id') id: ObjectId) {
+    const problem = await this.problemsService.findOne(id);
     if (problem) {
       return problem;
     } else {
