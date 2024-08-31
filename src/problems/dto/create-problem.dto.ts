@@ -18,4 +18,6 @@ export class CreateProblemDto {
 
   @IsNotEmpty()
   testCases: testcase[];
+
+  status: string;
 }

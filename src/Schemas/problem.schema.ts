@@ -26,6 +26,9 @@ export class Problem {
 
   @Prop()
   testCases: testcase[];
+
+  @Prop()
+  status: string;
 }
 
 export const ProblemSchema = SchemaFactory.createForClass(Problem);

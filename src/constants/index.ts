@@ -8,4 +8,3 @@ const commonLanguages = [
   { id: 92, name: 'Python' },
 ];
 export { commonLanguages };
-

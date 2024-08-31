@@ -43,7 +43,6 @@ export class ProblemsController {
     }
   }
 
-  @UseGuards(AuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: ObjectId) {
     try {
