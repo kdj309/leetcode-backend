@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { codesnipet } from 'src/interfaces/config.interface';
 
 export type ProblemDocument = HydratedDocument<Problem>;
 const difficultyLevels = ['easy', 'medium', 'hard'];
@@ -29,6 +30,9 @@ export class Problem {
 
   @Prop()
   status: string;
+
+  @Prop()
+  starterCode:codesnipet[];
 }
 
 export const ProblemSchema = SchemaFactory.createForClass(Problem);

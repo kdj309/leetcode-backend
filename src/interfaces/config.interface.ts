@@ -19,3 +19,8 @@ export interface signup {
   access_token: string;
   message: string;
 }
+
+export interface codesnipet{
+  lang_id:number,
+  code:string
+}

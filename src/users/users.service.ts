@@ -45,6 +45,7 @@ export class UsersService {
         return {
           data: {
             access_token: await this.jwtService.signAsync(payload),
+            id:newuser._id
           },
           message: 'User Created Successfully',
           status: 'Success',
