@@ -32,7 +32,7 @@ export class Problem {
   status: string;
 
   @Prop()
-  starterCode:codesnipet[];
+  starterCode: codesnipet[];
 }
 
 export const ProblemSchema = SchemaFactory.createForClass(Problem);

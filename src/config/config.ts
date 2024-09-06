@@ -1,5 +1,6 @@
 import { ConfigProps } from 'src/interfaces/config.interface';
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+dotenv.config();
 export const config = (): ConfigProps => ({
   port: parseInt(process.env.PORT, 10) || 8080,
   api: {

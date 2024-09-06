@@ -27,8 +27,18 @@ export class AuthController {
       //@ts-ignore
       response.cookie('access-token', authresponse.data.access_token, {
         httpOnly: true,
-        path: '/signin',
+        secure: process.env.NODE_ENV === 'production', // Should be true in production
+        domain: 'localhost', // Specify the domain correctly
+        path: '/',
       });
+      //@ts-ignore
+      response.cookie('id', authresponse.data.id, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production', // Should be true in production
+        domain: 'localhost', // Specify the domain correctly
+        path: '/',
+      });
+      delete authresponse.data.access_token;
       return authresponse;
     } catch (error) {
       return {

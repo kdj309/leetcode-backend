@@ -18,8 +18,8 @@ import { Roles } from 'src/roles/roles.decorator';
 import { Role } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGaurd } from 'src/roles/roles.guard';
-import { signup } from 'src/interfaces/config.interface';
 import { ObjectId } from 'mongoose';
+import { getSuccessResponse } from 'src/utils';
 
 @Controller('users')
 export class UsersController {
@@ -44,16 +44,31 @@ export class UsersController {
     @Body(new ValidationPipe()) createUserDto: createUser,
     @Res({ passthrough: true }) response: Response,
   ) {
-    console.log(createUserDto);
     const newUser = createUserDto;
     try {
       //@ts-ignore
-      const usermessage: signup = await this.userSrvice.createUser(newUser);
-      //@ts-ignore
-      response.cookie('access-token', usermessage.data.access_token, {
-        httpOnly: true,
-      });
-      return usermessage;
+      const usermessage = await this.userSrvice.createUser(newUser);
+      if (typeof usermessage === 'string') {
+        return getSuccessResponse(null, usermessage);
+      } else {
+        //@ts-ignore
+        response.cookie('access-token', usermessage.data.access_token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          domain: 'localhost',
+          path: '/',
+        });
+        //@ts-ignore
+        response.cookie('id', usermessage.data.id, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          domain: 'localhost',
+          path: '/',
+        });
+        delete usermessage.data.access_token;
+
+        return usermessage;
+      }
     } catch (error) {
       return {
         status: 'Failure',

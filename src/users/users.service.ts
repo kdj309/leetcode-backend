@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/Schemas/user.schema';
 import { Model, ObjectId } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
+import { getSuccessResponse } from 'src/utils';
 
 @Injectable()
 export class UsersService {
@@ -18,9 +19,12 @@ export class UsersService {
   }
 
   async getUser(id: ObjectId) {
-    const user = await this.userModel.findById(id);
+    const user = await this.userModel.findById(
+      id,
+      '-_password -hashedpassword',
+    );
     if (user) {
-      return user;
+      return getSuccessResponse(user, 'Successfully fetched the problem');
     } else {
       throw new Error('User Not Found');
     }
@@ -35,21 +39,19 @@ export class UsersService {
   }
 
   async createUser(userData: createUser) {
-    console.log(userData);
     try {
       const user = await this.userModel.findOne({ email: userData.email });
       if (!user) {
         const newuser = new this.userModel(userData);
         const payload = { sub: newuser.id, username: newuser.username };
         await newuser.save();
-        return {
-          data: {
+        return getSuccessResponse(
+          {
             access_token: await this.jwtService.signAsync(payload),
-            id:newuser._id
+            id: newuser._id,
           },
-          message: 'User Created Successfully',
-          status: 'Success',
-        };
+          'User Created Successfully',
+        );
       } else {
         return 'User Already Exists';
       }

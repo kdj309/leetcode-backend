@@ -20,7 +20,7 @@ export interface signup {
   message: string;
 }
 
-export interface codesnipet{
-  lang_id:number,
-  code:string
+export interface codesnipet {
+  lang_id: number;
+  code: string;
 }
