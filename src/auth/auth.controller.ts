@@ -4,10 +4,12 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Req,
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { signInDto } from './dto/signin-user.dto';
+import { getSuccessResponse } from 'src/utils';
 
 @Controller('auth')
 export class AuthController {
@@ -46,5 +48,28 @@ export class AuthController {
         error: error.message,
       };
     }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('logout')
+  async signOut(
+    @Req() req: Request,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    //@ts-ignore
+    response.clearCookie('access-token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS)
+      domain: 'localhost', // Or your domain
+      path: '/', // Clear cookie for all routes
+    });
+    //@ts-ignore
+    response.clearCookie('id', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS)
+      domain: 'localhost', // Or your domain
+      path: '/', // Clear cookie for all routes
+    });
+    return getSuccessResponse(null, 'SignOut Successfully');
   }
 }
