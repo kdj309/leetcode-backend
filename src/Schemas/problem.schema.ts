@@ -33,6 +33,9 @@ export class Problem {
 
   @Prop()
   starterCode: codesnipet[];
+
+  @Prop()
+  systemCode: codesnipet[];
 }
 
 export const ProblemSchema = SchemaFactory.createForClass(Problem);

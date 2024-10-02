@@ -25,7 +25,11 @@ export class ProblemsService {
 
   async findAll() {
     try {
-      const problems = await this.problemModule.find();
+      const problems = await this.problemModule
+        .find()
+        .select(
+          '-sampleInput -sampleOutput -testCases -starterCode -systemCode',
+        );
       return getSuccessResponse(problems, 'Fetched all problems');
     } catch (error) {
       if (error instanceof Error) throw new Error(error.message);

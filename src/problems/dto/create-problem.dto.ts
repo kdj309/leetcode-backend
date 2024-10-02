@@ -23,5 +23,8 @@ export class CreateProblemDto {
   status: string;
 
   @IsNotEmpty()
-  codesnipets: codesnipet[];
+  starterCode: codesnipet[];
+
+  @IsNotEmpty()
+  systemCode: codesnipet[];
 }
