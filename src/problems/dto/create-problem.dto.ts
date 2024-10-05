@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty } from 'class-validator';
-import { codesnipet } from 'src/interfaces/config.interface';
+import { codesnipet, metadata } from 'src/interfaces/config.interface';
 import { testcase } from 'src/Schemas/problem.schema';
 
 export class CreateProblemDto {
@@ -27,4 +27,7 @@ export class CreateProblemDto {
 
   @IsNotEmpty()
   systemCode: codesnipet[];
+
+  @IsNotEmpty()
+  metadata: metadata;
 }

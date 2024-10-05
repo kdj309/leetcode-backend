@@ -1,8 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { config } from './config/config';
+import { config as apiconfig } from './config/config';
 import * as cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,6 +12,12 @@ async function bootstrap() {
     origin: 'http://localhost:5173',
     credentials: true,
   });
-  await app.listen(config().port);
+  const config = new DocumentBuilder()
+    .setTitle('Leetcode backend')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+  await app.listen(apiconfig().port);
 }
 bootstrap();

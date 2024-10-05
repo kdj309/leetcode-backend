@@ -24,3 +24,11 @@ export interface codesnipet {
   lang_id: number;
   code: string;
 }
+
+export interface metadata {
+  input_format: string;
+  output_format: string;
+  judge_input_temple: string;
+  variable_names: Record<string, string>;
+  variable_types: Record<string, string>;
+}
