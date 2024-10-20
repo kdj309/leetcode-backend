@@ -3,9 +3,10 @@ import { createUser } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user-dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/Schemas/user.schema';
-import { Model, ObjectId } from 'mongoose';
+import { Model, ObjectId, Types } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { getSuccessResponse } from 'src/utils';
+import { submission } from 'src/interfaces/config.interface';
 
 @Injectable()
 export class UsersService {
@@ -63,15 +64,46 @@ export class UsersService {
   }
 
   async updateUser(id: number, updateUser: UpdateUserDto) {
-    const user = await this.userModel.findByIdAndUpdate(
-      id,
-      { ...updateUser },
-      { new: true },
-    );
-    if (user) {
-      return user;
-    } else {
-      throw new Error('User Not Found');
+    try {
+      const user = await this.userModel.findByIdAndUpdate(
+        id,
+        { ...updateUser },
+        { new: true },
+      );
+      if (user) {
+        return getSuccessResponse(user, 'User updated Successfully');
+      } else {
+        throw new Error('User Not Found');
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
+    }
+  }
+  async addSubmission(id: number, submission: submission) {
+    try {
+      const user = await this.userModel.findByIdAndUpdate(
+        id,
+        {
+          $push: {
+            submissions: {
+              ...submission,
+              problemId: new Types.ObjectId(submission.problemId),
+            },
+          },
+        },
+        { new: true },
+      );
+      if (user) {
+        return getSuccessResponse(user, 'User updated Successfully');
+      } else {
+        throw new Error('Failed To Update Submission');
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      }
     }
   }
 

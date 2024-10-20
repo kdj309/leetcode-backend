@@ -19,7 +19,8 @@ import { Role } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGaurd } from 'src/roles/roles.guard';
 import { ObjectId } from 'mongoose';
-import { getSuccessResponse } from 'src/utils';
+import { getFailureResponse, getSuccessResponse } from 'src/utils';
+import { submission } from 'src/interfaces/config.interface';
 
 @Controller('users')
 export class UsersController {
@@ -88,7 +89,20 @@ export class UsersController {
     try {
       return await this.userSrvice.updateUser(id, updateUserBody);
     } catch (error) {
-      throw new NotFoundException();
+      return getFailureResponse(error.message);
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Patch(':id/submission')
+  async addSubmission(
+    @Param('id') id: number,
+    @Body(new ValidationPipe()) newsubmission: submission,
+  ) {
+    try {
+      return await this.userSrvice.addSubmission(id, newsubmission);
+    } catch (error) {
+      return getFailureResponse(error.message);
     }
   }
 

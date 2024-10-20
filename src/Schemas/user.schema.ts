@@ -18,20 +18,14 @@ export class User {
   @Prop({ unique: true, required: true })
   email: string;
 
-  @Prop({
-    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Problem' }],
-    default: [],
-  })
-  solvedproblems: Problem[];
-
   @Prop({ type: String, enum: supportedlanguages })
   favoriteProgrammingLanguage: string;
 
   @Prop({ default: [] })
   submissions: {
-    problemId: mongoose.Schema.Types.ObjectId;
+    problemId: { type: mongoose.Schema.Types.ObjectId; ref: Problem };
     submissionId: string;
-    languageId: string;
+    languageId: number;
     status: string;
     submittedAt: Date;
   }[];

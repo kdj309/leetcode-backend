@@ -16,7 +16,6 @@ export class createUser {
   @IsNotEmpty()
   password: string;
 
-  @IsEnum(['user', 'admin'])
   roles: Role[];
 
   @IsEnum(supportedlanguages)

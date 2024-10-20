@@ -1,3 +1,5 @@
+import { ObjectId } from 'mongoose';
+
 interface ApiConfigProps {
   apiUrl: string;
   httpTimeout: number;
@@ -31,4 +33,12 @@ export interface metadata {
   judge_input_temple: string;
   variable_names: Record<string, string>;
   variable_types: Record<string, string>;
+}
+
+export interface submission {
+  problemId: string;
+  submissionId: string;
+  languageId: number;
+  status: string;
+  submittedAt: Date;
 }
