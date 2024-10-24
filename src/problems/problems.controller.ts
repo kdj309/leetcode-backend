@@ -42,7 +42,8 @@ export class ProblemsController {
       if (error instanceof Error) return getFailureResponse(error.message);
     }
   }
-
+  
+  @UseGuards(AuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: ObjectId) {
     try {

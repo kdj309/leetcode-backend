@@ -6,11 +6,13 @@ import { ProblemsModule } from './problems/problems.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { config } from './config/config';
 import { AuthModule } from './auth/auth.module';
+import { RetrytokenModule } from './retrytoken/retrytoken.module';
 @Module({
   imports: [
     MongooseModule.forRoot(config().mongodb.database.connectionString),
     UsersModule,
     ProblemsModule,
+    RetrytokenModule,
     AuthModule,
   ],
   controllers: [AppController],

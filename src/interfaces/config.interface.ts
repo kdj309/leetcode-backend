@@ -1,5 +1,3 @@
-import { ObjectId } from 'mongoose';
-
 interface ApiConfigProps {
   apiUrl: string;
   httpTimeout: number;

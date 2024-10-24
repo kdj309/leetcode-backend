@@ -21,6 +21,7 @@ import { RolesGaurd } from 'src/roles/roles.guard';
 import { ObjectId } from 'mongoose';
 import { getFailureResponse, getSuccessResponse } from 'src/utils';
 import { submission } from 'src/interfaces/config.interface';
+import { Response } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -47,19 +48,16 @@ export class UsersController {
   ) {
     const newUser = createUserDto;
     try {
-      //@ts-ignore
       const usermessage = await this.userSrvice.createUser(newUser);
       if (typeof usermessage === 'string') {
         return getSuccessResponse(null, usermessage);
       } else {
-        //@ts-ignore
         response.cookie('access-token', usermessage.data.access_token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
           domain: 'localhost',
           path: '/',
         });
-        //@ts-ignore
         response.cookie('id', usermessage.data.id, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
@@ -67,7 +65,6 @@ export class UsersController {
           path: '/',
         });
         delete usermessage.data.access_token;
-
         return usermessage;
       }
     } catch (error) {
@@ -76,8 +73,6 @@ export class UsersController {
         error: error.message,
       };
     }
-
-    //@ts-ignore
   }
 
   @UseGuards(AuthGuard)

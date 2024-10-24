@@ -4,10 +4,13 @@ import { UsersModule } from '../users/users.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { jwtConstants } from './constants';
+import { RetrytokenModule } from 'src/retrytoken/retrytoken.module';
+import { RetrytokenService } from 'src/retrytoken/retrytoken.service';
 
 @Module({
   imports: [
     UsersModule,
+    RetrytokenModule,
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,
