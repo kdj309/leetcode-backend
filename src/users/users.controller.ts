@@ -22,6 +22,7 @@ import { ObjectId } from 'mongoose';
 import { getFailureResponse, getSuccessResponse } from 'src/utils';
 import { submission } from 'src/interfaces/config.interface';
 import { Response } from 'express';
+import { SessionGuard } from 'src/sessiontoken/session.guard';
 
 @Controller('users')
 export class UsersController {
@@ -88,7 +89,7 @@ export class UsersController {
     }
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, SessionGuard)
   @Patch(':id/submission')
   async addSubmission(
     @Param('id') id: number,

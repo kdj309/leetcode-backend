@@ -18,12 +18,13 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGaurd } from 'src/roles/roles.guard';
 import { ObjectId } from 'mongoose';
 import { getFailureResponse } from 'src/utils';
+import { SessionGuard } from 'src/sessiontoken/session.guard';
 
 @Controller('problems')
 export class ProblemsController {
   constructor(private readonly problemsService: ProblemsService) {}
 
-  @UseGuards(AuthGuard, RolesGaurd)
+  @UseGuards(AuthGuard, RolesGaurd, SessionGuard)
   @Post('createProblem/:userId')
   @Roles(Role.Admin)
   async create(@Body() createProblemDto: CreateProblemDto) {
@@ -42,8 +43,8 @@ export class ProblemsController {
       if (error instanceof Error) return getFailureResponse(error.message);
     }
   }
-  
-  @UseGuards(AuthGuard)
+
+  @UseGuards(AuthGuard, SessionGuard)
   @Get(':id')
   async findOne(@Param('id') id: ObjectId) {
     try {

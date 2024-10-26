@@ -10,15 +10,13 @@ export class RetrytokenService {
     @InjectModel(Retrytoken.name) private retryModule: Model<Retrytoken>,
   ) {}
 
-  async createToken(user:User) {
-
+  async createToken(user: User) {
     try {
       //@ts-ignore
-      return this.retryModule.generateToken(user)
+      return this.retryModule.generateToken(user);
     } catch (error) {
-      throw error
+      throw error;
     }
-      
   }
 
   async findTokenByUserId(userId: mongoose.Schema.Types.ObjectId) {
@@ -30,29 +28,31 @@ export class RetrytokenService {
     }
   }
 
-  async findToken(token:string){
+  async findToken(token: string) {
     try {
-      const refreshtoken = await this.retryModule.findOne({ token }).populate("userId");
+      const refreshtoken = await this.retryModule
+        .findOne({ token })
+        .populate('userId');
       return refreshtoken;
     } catch (error) {
       throw error;
     }
   }
-  async validateExpiry(token:Retrytoken){
+  async validateExpiry(token: Retrytoken) {
     try {
       //@ts-ignore
-      const refreshtoken = this.retryModule.verifyExpiry(token)
-      return refreshtoken
+      const refreshtoken = this.retryModule.verifyExpiry(token);
+      return refreshtoken;
     } catch (error) {
       throw error;
     }
   }
-  async findAndDelete(id:mongoose.Types.ObjectId){
+  async findAndDelete(token: string) {
     try {
-      const deletedToken=await this.retryModule.findByIdAndDelete(id)
-      return deletedToken
+      const deletedToken = await this.retryModule.findOneAndDelete({ token });
+      return deletedToken;
     } catch (error) {
-      throw error
+      throw error;
     }
   }
 }

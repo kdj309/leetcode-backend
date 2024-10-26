@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
-import {  User } from './user.schema';
+import { User } from './user.schema';
 
 @Schema({ timestamps: true })
 export class SessionToken {
@@ -14,4 +14,3 @@ export class SessionToken {
   expiryDate: Date;
 }
 export const SessionTokenSchema = SchemaFactory.createForClass(SessionToken);
-

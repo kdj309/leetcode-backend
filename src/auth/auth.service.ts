@@ -1,9 +1,15 @@
-import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { getFailureResponse, getSuccessResponse } from 'src/utils';
+import { getSuccessResponse } from 'src/utils';
 import { RetrytokenService } from 'src/retrytoken/retrytoken.service';
-import { User } from 'src/Schemas/user.schema';
+import { SessiontokenService } from 'src/sessiontoken/sessiontoken.service';
+import { jwtConstants } from './constants';
 
 @Injectable()
 export class AuthService {
@@ -11,6 +17,7 @@ export class AuthService {
     private usersService: UsersService,
     private retryService: RetrytokenService,
     private jwtService: JwtService,
+    private sessionService: SessiontokenService,
   ) {}
 
   async signIn(email: string, pass: string) {
@@ -28,11 +35,17 @@ export class AuthService {
         refreshtoken = await this.retryService.createToken(user);
       }
       const payload = { sub: user.id, username: user.username };
+      const token = await this.jwtService.signAsync(payload, {
+        expiresIn: '1 days',
+        secret: jwtConstants.secret,
+      });
+      const sessiontoken = await this.sessionService.createToken(user._id);
       return getSuccessResponse(
         {
-          access_token: await this.jwtService.signAsync(payload,{expiresIn:"1 days"}),
+          access_token: token,
           id: user._id,
           refreshtoken,
+          sessiontoken,
         },
         'Sign-In Successfully',
       );
@@ -43,35 +56,75 @@ export class AuthService {
     }
   }
 
-  async verifyAndGenerateNewToken(token:string){
+  async verifyAndGenerateNewToken(token: string) {
     if (token == null) {
-      throw new HttpException("Refresh Token is required!",HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Refresh Token is required!',
+        HttpStatus.BAD_REQUEST,
+      );
     }
-  
+
     try {
       let refreshToken = await this.retryService.findToken(token);
-    
+
       if (!refreshToken) {
-      throw new HttpException("Refresh Token is required!",HttpStatus.BAD_REQUEST);
+        throw new HttpException(
+          'Refresh Token is required!',
+          HttpStatus.BAD_REQUEST,
+        );
       }
       //@ts-ignore
-      const isExpired=await this.retryService.validateExpiry(refreshToken);
+      const isExpired = await this.retryService.validateExpiry(refreshToken);
 
       if (isExpired) {
         await refreshToken.deleteOne();
-      throw new HttpException("Refresh token was expired. Please make a new signin request",HttpStatus.NOT_FOUND);
-
+        throw new HttpException(
+          'Refresh token was expired. Please make a new signin request',
+          HttpStatus.NOT_FOUND,
+        );
       }
       //@ts-ignore
-      const payload = { sub:refreshToken.userId, username:refreshToken.userId.username };
-      const newAccessToken= await this.jwtService.signAsync(payload,{expiresIn:60})
-  
-      return getSuccessResponse({
-        accessToken: newAccessToken,
-        refreshToken: refreshToken.token,
-      },"Successfully created a new access token");
+      const payload = {
+        sub: refreshToken.userId,
+        username: refreshToken.userId.username,
+      };
+      const newAccessToken = await this.jwtService.signAsync(payload, {
+        expiresIn: 60,
+      });
+
+      return getSuccessResponse(
+        {
+          accessToken: newAccessToken,
+          refreshToken: refreshToken.token,
+        },
+        'Successfully created a new access token',
+      );
     } catch (err) {
-      throw err
+      throw err;
+    }
+  }
+
+  async invalidatSessionToken(token: string) {
+    try {
+      await this.sessionService.invalidateSession(token);
+      return;
+    } catch (error) {
+      throw error.message;
+    }
+  }
+  async validateToken(token: string) {
+    const session = await this.sessionService.validateSession(token);
+    if (!session) {
+      throw new UnauthorizedException('Invalid session');
+    }
+    return session;
+  }
+  async invalidateRetryToken(token: string) {
+    try {
+      await this.retryService.findAndDelete(token);
+      return;
+    } catch (error) {
+      throw error;
     }
   }
 }
