@@ -32,7 +32,7 @@ export class RetrytokenService {
     try {
       const refreshtoken = await this.retryModule
         .findOne({ token })
-        .populate('userId');
+        .populate('userId','-hashedpassword');
       return refreshtoken;
     } catch (error) {
       throw error;
