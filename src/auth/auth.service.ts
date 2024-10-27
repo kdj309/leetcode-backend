@@ -36,7 +36,7 @@ export class AuthService {
       }
       const payload = { sub: user.id, username: user.username };
       const token = await this.jwtService.signAsync(payload, {
-        expiresIn: '1 days',
+        expiresIn: '1h',
         secret: jwtConstants.secret,
       });
       const sessiontoken = await this.sessionService.createToken(user._id);
@@ -89,7 +89,7 @@ export class AuthService {
         username: refreshToken.userId.username,
       };
       const newAccessToken = await this.jwtService.signAsync(payload, {
-        expiresIn: 60,
+        expiresIn: '1h',
       });
 
       return getSuccessResponse(

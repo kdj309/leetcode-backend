@@ -44,7 +44,7 @@ export class ProblemsController {
     }
   }
 
-  @UseGuards(AuthGuard, SessionGuard)
+  @UseGuards(AuthGuard)
   @Get(':id')
   async findOne(@Param('id') id: ObjectId) {
     try {
@@ -59,7 +59,7 @@ export class ProblemsController {
   }
 
   @Roles(Role.Admin)
-  @UseGuards(AuthGuard, RolesGaurd)
+  @UseGuards(AuthGuard, RolesGaurd, SessionGuard)
   @Patch(':id/:userId')
   async update(
     @Param('id') id: ObjectId,
@@ -73,7 +73,7 @@ export class ProblemsController {
   }
 
   @Roles(Role.Admin)
-  @UseGuards(AuthGuard, RolesGaurd)
+  @UseGuards(AuthGuard, RolesGaurd, SessionGuard)
   @Delete(':id/:userId')
   async remove(@Param('id') id: ObjectId) {
     try {

@@ -32,7 +32,7 @@ export class UsersController {
     return await this.userSrvice.getAllUsers();
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, SessionGuard)
   @Get(':id')
   async getUser(@Param('id') id: ObjectId) {
     try {
@@ -76,7 +76,7 @@ export class UsersController {
     }
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, SessionGuard)
   @Patch(':id')
   async updateUser(
     @Param('id') id: number,
@@ -103,7 +103,7 @@ export class UsersController {
   }
 
   @Roles(Role.Admin)
-  @UseGuards(AuthGuard, RolesGaurd)
+  @UseGuards(AuthGuard, RolesGaurd, SessionGuard)
   @Delete(':id/:userId')
   async deleteUser(@Param('id') id: number) {
     try {

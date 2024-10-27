@@ -15,7 +15,7 @@ export class SessiontokenService {
       const token = new this.sessionModel({
         userId,
         token: uuidv4(),
-        expiryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        expiryDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 7 days
       });
       const savedtoken = await token.save();
       return savedtoken.token;
@@ -26,7 +26,7 @@ export class SessiontokenService {
   async validateSession(token: string): Promise<SessionToken | null> {
     const response = await this.sessionModel
       .findOne({ token, expiryDate: { $gt: new Date().toISOString() } })
-      .populate('userId','-hashedpassword');
+      .populate('userId', '-hashedpassword');
     return response;
   }
 

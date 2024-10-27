@@ -18,7 +18,7 @@ export const RetryTokenSchema = SchemaFactory.createForClass(Retrytoken);
 
 RetryTokenSchema.statics.generateToken = async function (user: UserDocument) {
   const expiredDate = new Date();
-  expiredDate.setSeconds(expiredDate.getSeconds() + 86400);
+  expiredDate.setSeconds(expiredDate.getSeconds() + 604800);
   const _token = uuidv4();
   const _object = new this({
     token: _token,
