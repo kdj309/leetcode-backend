@@ -93,8 +93,8 @@ export class UsersService {
             },
           },
         },
-        { new: true },
-      );
+        { new: true},
+      ).select("submissions");
       if (user) {
         return getSuccessResponse(user, 'User updated Successfully');
       } else {
