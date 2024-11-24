@@ -30,20 +30,29 @@ export class AuthController {
       response.cookie('access-token', authresponse.data.access_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Should be true in production
-        domain: 'localhost', // Specify the domain correctly
+        domain:
+          process.env.NODE_ENV === 'production'
+            ? process.env.DOMAIN
+            : 'localhost', // Specify the domain correctly
         path: '/',
         maxAge: 60 * 60 * 1000,
       });
       response.cookie('id', authresponse.data.id, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production', // Should be true in production
-        domain: 'localhost', // Specify the domain correctly
+        domain:
+          process.env.NODE_ENV === 'production'
+            ? process.env.DOMAIN
+            : 'localhost', // Specify the domain correctly
         path: '/',
       });
       response.cookie('refresh-token', authresponse.data.refreshtoken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        domain: 'localhost',
+        domain:
+          process.env.NODE_ENV === 'production'
+            ? process.env.DOMAIN
+            : 'localhost',
         path: '/',
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
@@ -77,25 +86,37 @@ export class AuthController {
     response.clearCookie('access-token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS)
-      domain: 'localhost', // Or your domain
+      domain:
+        process.env.NODE_ENV === 'production'
+          ? process.env.DOMAIN
+          : 'localhost', // Or your domain
       path: '/', // Clear cookie for all routes
     });
     response.clearCookie('id', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS)
-      domain: 'localhost', // Or your domain
+      domain:
+        process.env.NODE_ENV === 'production'
+          ? process.env.DOMAIN
+          : 'localhost', // Or your domain
       path: '/', // Clear cookie for all routes
     });
     response.clearCookie('refresh-token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS)
-      domain: 'localhost', // Or your domain
+      domain:
+        process.env.NODE_ENV === 'production'
+          ? process.env.DOMAIN
+          : 'localhost', // Or your domain
       path: '/', // Clear cookie for all routes
     });
     response.clearCookie('session-token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // Use secure cookies in production (HTTPS)
-      domain: 'localhost', // Or your domain
+      domain:
+        process.env.NODE_ENV === 'production'
+          ? process.env.DOMAIN
+          : 'localhost', // Or your domain
       path: '/', // Clear cookie for all routes
     });
     return getSuccessResponse(null, 'SignOut Successfully');

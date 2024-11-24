@@ -65,7 +65,7 @@ export class AuthService {
     }
 
     try {
-      let refreshToken = await this.retryService.findToken(token);
+      const refreshToken = await this.retryService.findToken(token);
 
       if (!refreshToken) {
         throw new HttpException(

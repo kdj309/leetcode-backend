@@ -14,6 +14,4 @@ import { SessiontokenService } from './sessiontoken.service';
   providers: [SessiontokenService],
   exports: [SessiontokenService],
 })
-export class SessiontokenModule implements NestModule {
-  configure(_: MiddlewareConsumer) {}
-}
+export class SessiontokenModule {}

@@ -68,7 +68,7 @@ export class ProblemsService {
 
   async remove(id: ObjectId) {
     try {
-      const _ = await this.problemModule.findByIdAndDelete(id);
+      await this.problemModule.findByIdAndDelete(id);
       return getSuccessResponse(
         `Problem ${id}`,
         'Problem deleted successfully',

@@ -56,13 +56,19 @@ export class UsersController {
         response.cookie('access-token', usermessage.data.access_token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          domain: 'localhost',
+          domain:
+            process.env.NODE_ENV === 'production'
+              ? process.env.DOMAIN
+              : 'localhost',
           path: '/',
         });
         response.cookie('id', usermessage.data.id, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          domain: 'localhost',
+          domain:
+            process.env.NODE_ENV === 'production'
+              ? process.env.DOMAIN
+              : 'localhost',
           path: '/',
         });
         delete usermessage.data.access_token;

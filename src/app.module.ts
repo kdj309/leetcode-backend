@@ -7,8 +7,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { config } from './config/config';
 import { AuthModule } from './auth/auth.module';
 import { RetrytokenModule } from './retrytoken/retrytoken.module';
-import { SessiontokenController } from './sessiontoken/sessiontoken.controller';
-import { SessiontokenService } from './sessiontoken/sessiontoken.service';
 import { SessiontokenModule } from './sessiontoken/sessiontoken.module';
 
 @Module({

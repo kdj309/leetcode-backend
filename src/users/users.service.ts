@@ -83,18 +83,20 @@ export class UsersService {
   }
   async addSubmission(id: number, submission: submission) {
     try {
-      const user = await this.userModel.findByIdAndUpdate(
-        id,
-        {
-          $push: {
-            submissions: {
-              ...submission,
-              problemId: new Types.ObjectId(submission.problemId),
+      const user = await this.userModel
+        .findByIdAndUpdate(
+          id,
+          {
+            $push: {
+              submissions: {
+                ...submission,
+                problemId: new Types.ObjectId(submission.problemId),
+              },
             },
           },
-        },
-        { new: true},
-      ).select("submissions");
+          { new: true },
+        )
+        .select('submissions');
       if (user) {
         return getSuccessResponse(user, 'User updated Successfully');
       } else {
