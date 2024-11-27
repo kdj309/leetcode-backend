@@ -32,7 +32,7 @@ export class AuthService {
         refreshtoken = previoustoken.token;
       } else {
         //@ts-ignore
-        refreshtoken = await this.retryService.createToken(user);
+        refreshtoken = await this.retryService.createToken(user._id);
       }
       const payload = { sub: user.id, username: user.username };
       const token = await this.jwtService.signAsync(payload, {
