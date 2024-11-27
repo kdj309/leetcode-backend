@@ -61,7 +61,7 @@ export class UsersController {
               ? process.env.DOMAIN
               : 'localhost',
           path: '/',
-        sameSite:"none"
+          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         });
         response.cookie('id', usermessage.data.id, {
           httpOnly: true,
@@ -71,7 +71,7 @@ export class UsersController {
               ? process.env.DOMAIN
               : 'localhost',
           path: '/',
-        sameSite:"none"
+          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         });
         delete usermessage.data.access_token;
         return usermessage;

@@ -36,7 +36,7 @@ export class AuthController {
             : 'localhost', // Specify the domain correctly
         path: '/',
         maxAge: 60 * 60 * 1000,
-        sameSite:"none"
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       });
       response.cookie('id', authresponse.data.id, {
         httpOnly: true,
@@ -46,7 +46,7 @@ export class AuthController {
             ? process.env.DOMAIN
             : 'localhost', // Specify the domain correctly
         path: '/',
-        sameSite:"none"
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       });
       response.cookie('refresh-token', authresponse.data.refreshtoken, {
         httpOnly: true,
@@ -57,14 +57,14 @@ export class AuthController {
             : 'localhost',
         path: '/',
         maxAge: 7 * 24 * 60 * 60 * 1000,
-        sameSite:"none"
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       });
       response.cookie('session-token', authresponse.data.sessiontoken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         path: '/',
         maxAge: 1 * 24 * 60 * 60 * 1000,
-        sameSite:"none"
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       });
       delete authresponse.data.access_token;
       delete authresponse.data.refreshtoken;
@@ -94,7 +94,7 @@ export class AuthController {
           ? process.env.DOMAIN
           : 'localhost', // Or your domain
       path: '/', // Clear cookie for all routes
-      sameSite:"none"
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     });
     response.clearCookie('id', {
       httpOnly: true,
@@ -104,7 +104,7 @@ export class AuthController {
           ? process.env.DOMAIN
           : 'localhost', // Or your domain
       path: '/', // Clear cookie for all routes
-      sameSite:"none"
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     });
     response.clearCookie('refresh-token', {
       httpOnly: true,
@@ -114,7 +114,7 @@ export class AuthController {
           ? process.env.DOMAIN
           : 'localhost', // Or your domain
       path: '/', // Clear cookie for all routes
-      sameSite:"none"
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     });
     response.clearCookie('session-token', {
       httpOnly: true,
@@ -124,7 +124,7 @@ export class AuthController {
           ? process.env.DOMAIN
           : 'localhost', // Or your domain
       path: '/', // Clear cookie for all routes
-      sameSite:"none"
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     });
     return getSuccessResponse(null, 'SignOut Successfully');
   }
@@ -141,14 +141,14 @@ export class AuthController {
         secure: process.env.NODE_ENV === 'production',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: '/',
-        sameSite:"none"
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       });
       response.cookie('access-token', newtokenresponse.data.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         maxAge: 15 * 60 * 1000, // 15 mintues
         path: '/',
-        sameSite:"none"
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       });
       delete newtokenresponse.data.refreshToken;
       delete newtokenresponse.data.accessToken;
