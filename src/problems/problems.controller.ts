@@ -44,7 +44,7 @@ export class ProblemsController {
     }
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(SessionGuard)
   @Get(':id')
   async findOne(@Param('id') id: ObjectId) {
     try {

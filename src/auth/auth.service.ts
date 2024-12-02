@@ -23,6 +23,7 @@ export class AuthService {
   async signIn(email: string, pass: string) {
     try {
       const user = await this.usersService.getUserByEmail(email);
+
       if (!user.authenticate(pass)) {
         throw new UnauthorizedException();
       }
