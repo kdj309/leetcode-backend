@@ -5,7 +5,7 @@ import { Problem } from './problem.schema';
 import * as bcrypt from 'bcrypt';
 import { Role } from 'src/enums/roles.enum';
 import { commonLanguages } from '../constants/index';
-const supportedlanguages = commonLanguages.map((l) => l.name);
+const supportedlanguages = commonLanguages.map((l) => l.id);
 export type UserDocument = HydratedDocument<User>;
 
 @Schema()
@@ -18,8 +18,8 @@ export class User {
   @Prop({ unique: true, required: true })
   email: string;
 
-  @Prop({ type: String, enum: supportedlanguages })
-  favoriteProgrammingLanguage: string;
+  @Prop({ type: Number, enum: supportedlanguages })
+  favoriteProgrammingLanguage: number;
 
   @Prop({ default: [] })
   submissions: {
