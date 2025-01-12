@@ -15,7 +15,9 @@ export class SessionGuard implements CanActivate {
     const request: Request = context.switchToHttp().getRequest();
     const sessiontoken = request.cookies['session-token'];
     if (!sessiontoken) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(
+        'You are not logged in. Please log in to continue.',
+      );
     }
     try {
       const token = await this.authService.validateToken(

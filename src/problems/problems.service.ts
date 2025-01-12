@@ -40,7 +40,7 @@ export class ProblemsService {
     try {
       const problem = await this.problemModule.findById(id);
       if (!problem) {
-        return -1;
+        return null;
       }
       return getSuccessResponse(problem, 'Successfully fetched the problem');
     } catch (error) {

@@ -32,6 +32,7 @@ export class ProblemsController {
       return await this.problemsService.create(createProblemDto);
     } catch (error) {
       if (error instanceof Error) return getFailureResponse(error.message);
+      return getFailureResponse('An unknown error occurred');
     }
   }
 
@@ -41,6 +42,7 @@ export class ProblemsController {
       return await this.problemsService.findAll();
     } catch (error) {
       if (error instanceof Error) return getFailureResponse(error.message);
+      return getFailureResponse('An unknown error occurred');
     }
   }
 
@@ -48,12 +50,13 @@ export class ProblemsController {
   async findOne(@Param('id') id: ObjectId) {
     try {
       const problem = await this.problemsService.findOne(id);
-      if (problem == -1) {
+      if (!problem) {
         throw new NotFoundException();
       }
       return problem;
     } catch (error) {
       if (error instanceof Error) return getFailureResponse(error.message);
+      return getFailureResponse('An unknown error occurred');
     }
   }
 
@@ -68,6 +71,7 @@ export class ProblemsController {
       return await this.problemsService.update(id, updateProblemDto);
     } catch (error) {
       if (error instanceof Error) return getFailureResponse(error.message);
+      return getFailureResponse('An unknown error occurred');
     }
   }
 
@@ -79,6 +83,7 @@ export class ProblemsController {
       return await this.problemsService.remove(id);
     } catch (error) {
       if (error instanceof Error) return getFailureResponse(error.message);
+      return getFailureResponse('An unknown error occurred');
     }
   }
 }

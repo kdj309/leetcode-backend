@@ -15,7 +15,9 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = request.cookies['access-token'];
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(
+        'You are not logged in. Please log in to continue.',
+      );
     }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
@@ -24,7 +26,9 @@ export class AuthGuard implements CanActivate {
       request['user'] = payload;
     } catch (error) {
       console.log({ error });
-      throw new UnauthorizedException();
+      throw new UnauthorizedException(
+        'Your session has expired or is invalid. Please log in again.',
+      );
     }
     return true;
   }
