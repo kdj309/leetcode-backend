@@ -1,7 +1,6 @@
 import { IsEmail, IsEnum, IsNotEmpty, MinLength } from 'class-validator';
-import { commonLanguages } from 'src/constants';
 import { Role } from 'src/enums/roles.enum';
-const supportedlanguages = commonLanguages.map((l) => l.id);
+import { supportedlanguages } from 'src/interfaces/config.interface';
 
 export class createUser {
   @MinLength(5)

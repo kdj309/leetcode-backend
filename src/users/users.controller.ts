@@ -63,6 +63,13 @@ export class UsersController {
           path: '/',
           sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         });
+        response.cookie('session-token', usermessage.data.sessiontoken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          path: '/',
+          maxAge: 1 * 24 * 60 * 60 * 1000,
+          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        });
         response.cookie('id', usermessage.data.id, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
@@ -73,7 +80,20 @@ export class UsersController {
           path: '/',
           sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         });
+        response.cookie('refresh-token', usermessage.data.refreshtoken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          domain:
+            process.env.NODE_ENV === 'production'
+              ? process.env.DOMAIN
+              : 'localhost',
+          path: '/',
+          maxAge: 7 * 24 * 60 * 60 * 1000,
+          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        });
         delete usermessage.data.access_token;
+        delete usermessage.data.sessiontoken;
+        delete usermessage.data.refreshtoken;
         return usermessage;
       }
     } catch (error) {

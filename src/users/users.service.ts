@@ -7,12 +7,16 @@ import { Model, ObjectId, Types } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { getSuccessResponse } from 'src/utils';
 import { submission } from 'src/interfaces/config.interface';
+import { SessiontokenService } from 'src/sessiontoken/sessiontoken.service';
+import { RetrytokenService } from 'src/retrytoken/retrytoken.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
+    private sessionService: SessiontokenService,
+    private retryTokenService: RetrytokenService,
   ) {}
 
   async getAllUsers() {
@@ -46,10 +50,15 @@ export class UsersService {
         const newuser = new this.userModel(userData);
         const payload = { sub: newuser.id, username: newuser.username };
         await newuser.save();
+        const sessiontoken = await this.sessionService.createToken(newuser._id);
+        //@ts-ignore
+        const refreshtoken = await this.retryTokenService.createToken(newuser._id,);
         return getSuccessResponse(
           {
             access_token: await this.jwtService.signAsync(payload),
             id: newuser._id,
+            sessiontoken,
+            refreshtoken,
           },
           'User Created Successfully',
         );

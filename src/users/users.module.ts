@@ -11,12 +11,15 @@ import { User, Userschema } from 'src/Schemas/user.schema';
 import { GetUserByIdMiddleware } from 'src/middlewares/get-user-by-id.middleware';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from 'src/auth/constants';
-import { AuthService } from 'src/auth/auth.service';
 import { AuthModule } from 'src/auth/auth.module';
+import { SessiontokenModule } from 'src/sessiontoken/sessiontoken.module';
+import { RetrytokenModule } from 'src/retrytoken/retrytoken.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: Userschema }]),
+    SessiontokenModule,
+    RetrytokenModule,
     JwtModule.register({
       global: true,
       secret: jwtConstants.secret,

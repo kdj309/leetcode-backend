@@ -4,8 +4,7 @@ import * as mongoose from 'mongoose';
 import { Problem } from './problem.schema';
 import * as bcrypt from 'bcrypt';
 import { Role } from 'src/enums/roles.enum';
-import { commonLanguages } from '../constants/index';
-const supportedlanguages = commonLanguages.map((l) => l.id);
+import { supportedlanguages } from 'src/interfaces/config.interface';
 export type UserDocument = HydratedDocument<User>;
 
 @Schema()
@@ -18,8 +17,8 @@ export class User {
   @Prop({ unique: true, required: true })
   email: string;
 
-  @Prop({ type: Number, enum: supportedlanguages })
-  favoriteProgrammingLanguage: number;
+  @Prop({ type: String, enum: supportedlanguages })
+  favoriteProgrammingLanguage: string;
 
   @Prop({ default: [] })
   submissions: {
