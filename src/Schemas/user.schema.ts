@@ -17,8 +17,8 @@ export class User {
   @Prop({ unique: true, required: true })
   email: string;
 
-  @Prop({ type: String, enum: supportedlanguages })
-  favoriteProgrammingLanguage: string;
+  @Prop({ type: Number, enum: supportedlanguages })
+  favoriteProgrammingLanguage: number;
 
   @Prop({ default: [] })
   submissions: {

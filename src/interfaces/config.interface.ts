@@ -41,11 +41,11 @@ export interface submission {
   submittedAt: Date;
 }
 export enum supportedlanguages {
-  'C' = '50',
-  'C++' = '54',
-  'C#' = '51',
-  'Go' = '95',
-  'Java' = '91',
-  'JavaScript' = '93',
-  'Python' = '92',
+  'C' = 50,
+  'C++' = 54,
+  'C#' = 51,
+  'Go' = 95,
+  'Java' = 91,
+  'JavaScript' = 93,
+  'Python' = 92,
 }
