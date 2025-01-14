@@ -1,70 +1,69 @@
-###################
-# BUILD FOR LOCAL DEVELOPMENT
-###################
-
-FROM node:18-alpine As development
+# Define build arguments
+ARG NODE_ENV="local"
+ARG FRONTEND_ORIGIN="http://localhost:3000"
 ARG MONGODB_CONNECTION_STRING=""
 ARG JWT_SECRET=""
 ARG DOMAIN=""
-ARG NODE_ENV="local"
-ARG FRONTEND_ORIGIN="http://localhost:3000"
+
+# Stage 1: Development
+FROM node:20 AS development
+
+# Use build arguments as environment variables
+ENV NODE_ENV=$NODE_ENV
+ENV FRONTEND_ORIGIN=$FRONTEND_ORIGIN
+ENV MONGODB_CONNECTION_STRING=$MONGODB_CONNECTION_STRING
+ENV JWT_SECRET=$JWT_SECRET
+ENV DOMAIN=$DOMAIN
+
 # Create app directory
 WORKDIR /usr/src/app
 
 # Copy application dependency manifests to the container image.
-# A wildcard is used to ensure copying both package.json AND package-lock.json (when available).
-# Copying this first prevents re-running npm install on every code change.
 COPY --chown=node:node package*.json ./
 
-# Install app dependencies using the `npm ci` command instead of `npm install`
-RUN MONGODB_CONNECTION_STRING=$MONGODB_CONNECTION_STRING \
-    JWT_SECRET=$JWT_SECRET \
-    DOMAIN=$DOMAIN \
-    NODE_ENV=$NODE_ENV \
-    FRONTEND_ORIGIN=$FRONTEND_ORIGIN \
-    npm ci
+# Install app dependencies using the `npm ci` command
+RUN npm install
 
 # Bundle app source
 COPY --chown=node:node . .
 
-# Use the node user from the image (instead of the root user)
-USER node
-
-###################
-# BUILD FOR PRODUCTION
-###################
-
-FROM node:18-alpine As build
-
-WORKDIR /usr/src/app
-
-COPY --chown=node:node package*.json ./
-
-# In order to run `npm run build` we need access to the Nest CLI which is a dev dependency. In the previous development stage we ran `npm ci` which installed all dependencies, so we can copy over the node_modules directory from the development image
-COPY --chown=node:node --from=development /usr/src/node_modules ./node_modules
-
-COPY --chown=node:node . .
-
-# Run the build command which creates the production bundle
+# Build the app
 RUN npm run build
 
-# Set NODE_ENV environment variable
-ENV NODE_ENV production
+# Stage 2: Production
+FROM node:20 AS production
 
-# Running `npm ci` removes the existing node_modules directory and passing in --only=production ensures that only the production dependencies are installed. This ensures that the node_modules directory is as optimized as possible
-RUN npm ci --only=production && npm cache clean --force
+ARG NODE_ENV="local"
+ARG FRONTEND_ORIGIN=""
+ARG MONGODB_CONNECTION_STRING=""
+ARG JWT_SECRET=""
+ARG DOMAIN=""
 
-USER node
+# Use build arguments as environment variables
+ENV NODE_ENV="production"
+ENV FRONTEND_ORIGIN=$FRONTEND_ORIGIN
+ENV MONGODB_CONNECTION_STRING=$MONGODB_CONNECTION_STRING
+ENV JWT_SECRET=$JWT_SECRET
+ENV DOMAIN=$DOMAIN
 
-###################
-# PRODUCTION
-###################
+# Create app directory
+WORKDIR /usr/src/app
 
-FROM node:18-alpine As production
+# Copy application dependency manifests to the container image.
+COPY --chown=node:node package*.json ./
 
-# Copy the bundled code from the build stage to the production image
-COPY --chown=node:node --from=build /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node --from=build /usr/src/app/dist ./dist
+# Install only production dependencies
+RUN npm install --only=production
 
-# Start the server using the production build
-CMD [ "node", "dist/main.js" ]
+# Copy built files and node_modules from the development stage
+COPY --chown=node:node --from=development /usr/src/app/dist ./dist
+COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modules
+
+# Copy the rest of the application source code
+COPY --chown=node:node . .
+
+# Expose the port the app runs on
+EXPOSE 3000
+
+# Command to run the app
+CMD ["node", "dist/main"]
