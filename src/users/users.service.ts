@@ -52,9 +52,7 @@ export class UsersService {
         await newuser.save();
         const sessiontoken = await this.sessionService.createToken(newuser._id);
         //@ts-ignore
-        const refreshtoken = await this.retryTokenService.createToken(
-          newuser._id,
-        );
+        const refreshtoken = await this.retryTokenService.createToken(newuser._id);
         return getSuccessResponse(
           {
             access_token: await this.jwtService.signAsync(payload),
