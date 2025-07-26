@@ -49,3 +49,14 @@ export enum supportedlanguages {
   'JavaScript' = 93,
   'Python' = 92,
 }
+export interface SubmissionFilters {
+  page?: number;
+  limit?: number;
+  status?: "ACCEPTED"|"WRONG_ANSWER";
+  problemId?: string;            
+  languageId?: number;             
+  dateFrom?: Date;                  
+  dateTo?: Date;                    
+  sortBy?: 'submittedAt' | 'executionTime' | 'status';
+  sortOrder?: 'asc' | 'desc';
+}

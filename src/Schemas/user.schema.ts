@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import * as mongoose from 'mongoose';
-import { Problem } from './problem.schema';
 import * as bcrypt from 'bcrypt';
 import { Role } from 'src/enums/roles.enum';
 import { supportedlanguages } from 'src/interfaces/config.interface';
+import { Submission } from './submission.schema';
 export type UserDocument = HydratedDocument<User>;
 
 @Schema()
@@ -20,14 +20,8 @@ export class User {
   @Prop({ type: Number, enum: supportedlanguages })
   favoriteProgrammingLanguage: number;
 
-  @Prop({ default: [] })
-  submissions: {
-    problemId: { type: mongoose.Schema.Types.ObjectId; ref: Problem };
-    submissionId: string;
-    languageId: number;
-    status: string;
-    submittedAt: Date;
-  }[];
+  @Prop({ type: mongoose.Schema.Types.ObjectId, default: [], ref: 'Submission' })
+  submissions: Submission[];
 
   @Prop()
   hashedpassword: string;
