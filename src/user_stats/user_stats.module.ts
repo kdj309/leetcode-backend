@@ -3,6 +3,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserStat, UserStatSchema } from 'src/Schemas/userstat.schema';
 import { UserStatsController } from './user_stats.controller';
 import { UserStatsService } from './user_stats.service';
+import { SubmissionModule } from 'src/submission/submission.module';
+import { Submission, SubmissionSchema } from 'src/Schemas/submission.schema';
+import { AuthModule } from 'src/auth/auth.module';
+import { SessiontokenModule } from 'src/sessiontoken/sessiontoken.module';
 
 @Module({
   imports: [
@@ -11,7 +15,13 @@ import { UserStatsService } from './user_stats.service';
         name: UserStat.name,
         schema: UserStatSchema,
       },
+      {
+        name:Submission.name,
+        schema:SubmissionSchema
+      }
     ]),
+    AuthModule,
+    SessiontokenModule
   ],
   controllers: [UserStatsController],
   providers: [UserStatsService],

@@ -14,6 +14,11 @@ export interface ConfigProps {
   mongodb: {
     database: MongodbConfigProps;
   };
+  redis:{
+    url:string;
+    password:string;
+    port:string
+  }
 }
 export interface signup {
   access_token: string;
@@ -59,4 +64,10 @@ export interface SubmissionFilters {
   dateTo?: Date;                    
   sortBy?: 'submittedAt' | 'executionTime' | 'status';
   sortOrder?: 'asc' | 'desc';
+}
+export enum LeaderboardJobs {
+  RECALCULATE_ALL_RANKS = 'recalculate-all-ranks',
+  RECALCULATE_USER_RANK = 'recalculate-user-rank', 
+  UPDATE_LEADERBOARD_CACHE = 'update-leaderboard-cache',
+  CLEANUP_OLD_SNAPSHOTS = 'cleanup-old-snapshots'
 }

@@ -15,4 +15,9 @@ export const config = (): ConfigProps => ({
       databaseName: process.env.NODE_ENV || 'local',
     },
   },
+  redis:{
+    url:process.env.REDIS_HOST,
+    password:process.env.REDIS_PASSWORD,
+    port:process.env.REDIS_PORT
+  }
 });

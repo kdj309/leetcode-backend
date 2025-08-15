@@ -9,7 +9,7 @@ import { getSuccessResponse } from 'src/utils';
 export class UserStatsService {
   constructor(
     @InjectModel(UserStat.name) private userStatModule: Model<UserStat>,
-    @InjectModel(Submission.name) private submissionModule:Model<Submission>
+    @InjectModel(Submission.name) private submissionModule: Model<Submission>,
   ) {}
   async create(userId: string) {
     const defaultStats = {
@@ -38,17 +38,17 @@ export class UserStatsService {
   }
 
   async updateStats(userId: string, difficulty: string, problemId: string) {
-     const alreadySolved = await this.submissionModule.findOne({
-    userId: new Types.ObjectId(userId),
-    problemId: new Types.ObjectId(problemId), 
-    status: 'ACCEPTED'
-  });
-  
-  if (alreadySolved) {
-    return { message: "Problem already solved, no points added" };
-  }
-  
-  const points = { easy: 1, medium: 3, hard: 5 }[difficulty];
+    const alreadySolved = await this.submissionModule.findOne({
+      userId: new Types.ObjectId(userId),
+      problemId: new Types.ObjectId(problemId),
+      status: 'ACCEPTED',
+    });
+
+    if (alreadySolved) {
+      return { message: 'Problem already solved, no points added' };
+    }
+
+    const points = { easy: 1, medium: 3, hard: 5 }[difficulty];
     const updateData = {
       $inc: {
         totalPoints: points,
@@ -99,7 +99,42 @@ export class UserStatsService {
       if (error instanceof Error) throw new Error(error.message);
     }
   }
-  async getAllForLeaderboard(page: number, limit: number) { 
+  async getAllForLeaderboard(page: number, limit: number) {}
+  async getAllUsersSorted() {
+    try {
+      const sortedUserByPoints = await this.userStatModule
+        .find()
+        .sort({ totalPoints: -1, lastUpdated: -1 })
+        .lean();
+      return sortedUserByPoints;
+    } catch (error) {
+      if (error instanceof Error) throw new Error(error.message);
+    }
+  }
+  async updateRanksBatch(users: UserStat[], startIndex: number) {
+    try {
+      const bulkOps = users.map((u, idx) => {
+        const newRank = startIndex + idx + 1;
 
-   }
+        return {
+          updateOne: {
+            //@ts-ignore
+            filter: { _id: u._id },
+            update: {
+              $set: {
+                previousRank: u.currentRank,
+                currentRank: newRank,
+                lastUpdated: new Date(),
+              },
+            },
+          },
+        };
+      });
+      if (bulkOps.length > 0) {
+        await this.userStatModule.bulkWrite(bulkOps);
+      }
+    } catch (error) {
+      if (error instanceof Error) throw new Error(error.message);
+    }
+  }
 }
