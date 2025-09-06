@@ -17,7 +17,11 @@ export class LeaderboardCacheService {
     private LeadboardCacheModule: Model<LeadBoardCache>,
     @Inject('REDIS_CLIENT') private readonly redis: Redis,
   ) {}
-  async create(leaderboardData: any) {
+  private readonly CACHE_TTL_SECONDS = 3600; // 1 hour
+  private readonly CACHE_TTL_MS = this.CACHE_TTL_SECONDS * 1000;
+  async create(leaderboardData: UserStat[]) {
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + this.CACHE_TTL_MS);
     try {
       await this.redis
         .multi()
@@ -25,11 +29,20 @@ export class LeaderboardCacheService {
           this.CACHE_KEYS.GLOBAL_LEADERBOARD,
           JSON.stringify(leaderboardData),
           'EX',
-          3600,
+          this.CACHE_TTL_SECONDS,
         )
-        .set(this.CACHE_KEYS.LAST_UPDATE, new Date().toISOString(), 'EX', 3600)
+        .set(
+          this.CACHE_KEYS.LAST_UPDATE,
+          new Date().toISOString(),
+          'EX',
+          this.CACHE_TTL_SECONDS,
+        )
         .exec();
-      const leaderboardCache = new this.LeadboardCacheModule(leaderboardData);
+      const leaderboardCache = new this.LeadboardCacheModule({
+        rankings: leaderboardData,
+        generatedAt: new Date(),
+        expiresAt,
+      });
       await leaderboardCache.save();
       return {
         success: true,
@@ -37,7 +50,7 @@ export class LeaderboardCacheService {
         message: 'Leaderboard cache created successfully',
       };
     } catch (error) {
-      if (error instanceof Error) throw new Error(error.message);
+      if (error instanceof Error) throw new Error(`Error in  leaderboard create method ${error.message}`);
     }
   }
   async invalidateCache(): Promise<void> {

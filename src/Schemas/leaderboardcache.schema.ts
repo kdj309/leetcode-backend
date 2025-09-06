@@ -1,22 +1,19 @@
-import {Schema, SchemaFactory } from '@nestjs/mongoose';
+import {Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
+import { UserStat, UserStatSchema } from './userstat.schema';
 
 @Schema({ timestamps: true })
 export class LeadBoardCache {
+  @Prop({ 
+    type: [UserStatSchema], 
+    default: [] 
+  })
+  rankings: UserStat[];
 
-  rankings: [
-    {
-      userId: mongoose.Schema.Types.ObjectId,
-      username: String,
-      totalPoints: Number,
-      rank: Number,
-      easyCount: Number,
-      mediumCount: Number,
-      hardCount: Number,
-      isOnline: Boolean
-    }
-  ];
+  @Prop({ default: Date.now })
   generatedAt: Date;
-  expiresAt: Date
+
+  @Prop()
+  expiresAt: Date;
 }
 export const LeadBoardCacheSchema = SchemaFactory.createForClass(LeadBoardCache);

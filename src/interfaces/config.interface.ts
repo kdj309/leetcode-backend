@@ -18,6 +18,11 @@ export interface ConfigProps {
     url:string;
     password:string;
     port:string
+  },
+  judge:{
+    url:string,
+    key:string,
+    host:string
   }
 }
 export interface signup {
@@ -70,4 +75,7 @@ export enum LeaderboardJobs {
   RECALCULATE_USER_RANK = 'recalculate-user-rank', 
   UPDATE_LEADERBOARD_CACHE = 'update-leaderboard-cache',
   CLEANUP_OLD_SNAPSHOTS = 'cleanup-old-snapshots'
+}
+export interface batchsubmission {
+  token: string;
 }

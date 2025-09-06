@@ -10,6 +10,8 @@ import { UserStatsModule } from 'src/user_stats/user_stats.module';
 import { LeaderboardProcessor } from './leadeboard-processor';
 import { AuthModule } from 'src/auth/auth.module';
 import { SessiontokenModule } from 'src/sessiontoken/sessiontoken.module';
+import { UsersModule } from 'src/users/users.module';
+import { SubmissionModule } from 'src/submission/submission.module';
 
 
 @Module({
@@ -19,7 +21,9 @@ import { SessiontokenModule } from 'src/sessiontoken/sessiontoken.module';
     ]),
     UserStatsModule,
     AuthModule,
-    SessiontokenModule
+    SessiontokenModule,
+    UsersModule,
+    SubmissionModule
   ],
   controllers: [LeaderboardCacheController],
   providers: [LeaderboardCacheService,LeaderboardProcessor],

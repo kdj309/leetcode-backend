@@ -11,9 +11,9 @@ export class UserStatsService {
     @InjectModel(UserStat.name) private userStatModule: Model<UserStat>,
     @InjectModel(Submission.name) private submissionModule: Model<Submission>,
   ) {}
-  async create(userId: string) {
+  async create(userId: Types.ObjectId) {
     const defaultStats = {
-      userId: new Types.ObjectId(userId),
+      userId,
       totalPoints: 0,
       easyProblems: 0,
       mediumProblems: 0,
@@ -26,59 +26,83 @@ export class UserStatsService {
       lastUpdated: new Date(),
     };
     try {
-      const response = await this.userStatModule.updateOne(
-        { userId: new Types.ObjectId(userId) },
-        { $setOnInsert: defaultStats },
-        { upsert: true },
-      );
+      const existingStats = await this.userStatModule.findOne({ userId });
+
+      if (existingStats) {
+        return getSuccessResponse(existingStats, 'User Stats already exist');
+      }
+      const newStats = new this.userStatModule(defaultStats);
+      const response = await newStats.save();
+
       return getSuccessResponse(response, 'User Stat Created Succesfully');
     } catch (error) {
-      if (error instanceof Error) throw new Error(error.message);
+      if (error instanceof Error)
+        throw new Error(`create UserStatsService ${error.message}`);
     }
   }
 
-  async updateStats(userId: string, difficulty: string, problemId: string) {
-    const alreadySolved = await this.submissionModule.findOne({
-      userId: new Types.ObjectId(userId),
-      problemId: new Types.ObjectId(problemId),
-      status: 'ACCEPTED',
-    });
+  async updateStats(
+    userId: string | Types.ObjectId,
+    difficulty: string,
+    problemId: string,
+  ) {
+    const userObjectId =
+      typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
 
-    if (alreadySolved) {
-      return { message: 'Problem already solved, no points added' };
+    // Convert problemId to ObjectId
+    const problemObjectId = new Types.ObjectId(problemId);
+    try {
+      const alreadySolved = await this.submissionModule.findOne({
+        userId: userObjectId,
+        problemId: problemObjectId,
+        status: 'ACCEPTED',
+      });
+
+      if (alreadySolved) {
+        return { message: 'Problem already solved, no points added' };
+      }
+
+      const points = { easy: 1, medium: 3, hard: 5 }[difficulty];
+      const updateData = {
+        $inc: {
+          totalPoints: points,
+          [`${difficulty}Problems`]: 1,
+          totalSolved: 1,
+        },
+        $set: {
+          lastUpdated: new Date(),
+        },
+        $setOnInsert: {
+          userId: userObjectId,
+          currentRank: 0,
+          previousRank: 0,
+          isOnline: false,
+          lastSeen: new Date(),
+        },
+      };
+
+      const response = await this.userStatModule.updateOne(
+        { userId: userObjectId },
+        updateData,
+        { upsert: true },
+      );
+      return response;
+    } catch (error) {
+      if (error instanceof Error)
+        throw new Error(
+          `Error In updateStats of UserStatsService ${error.message}`,
+        );
     }
-
-    const points = { easy: 1, medium: 3, hard: 5 }[difficulty];
-    const updateData = {
-      $inc: {
-        totalPoints: points,
-        [`${difficulty}Problems`]: 1,
-        totalSolved: 1,
-      },
-      $set: {
-        lastUpdated: new Date(),
-      },
-      $setOnInsert: {
-        userId: new Types.ObjectId(userId),
-        currentRank: 0,
-        previousRank: 0,
-        isOnline: false,
-        lastSeen: new Date(),
-      },
-    };
-
-    return await this.userStatModule.updateOne(
-      { userId: new Types.ObjectId(userId) },
-      updateData,
-      { upsert: true },
-    );
   }
   async findByUserId(userId: string) {
     try {
       const userStas = await this.userStatModule.findOne({ userId });
       return getSuccessResponse(userStas, 'User Statistics');
     } catch (error) {
-      if (error instanceof Error) throw new Error(error.message);
+      if (error instanceof Error)
+        throw new Error(
+          `error in findByUserId of UserStatsService ${error.message}`,
+        );
     }
   }
   async updateOnlineStatus(userId: string, isOnline: boolean) {
@@ -96,10 +120,9 @@ export class UserStatsService {
         'Successfully updated the userstat',
       );
     } catch (error) {
-      if (error instanceof Error) throw new Error(error.message);
+      if (error instanceof Error) throw new Error(`error in updateOnlineStatus of UserStat module ${error.message}`);
     }
   }
-  async getAllForLeaderboard(page: number, limit: number) {}
   async getAllUsersSorted() {
     try {
       const sortedUserByPoints = await this.userStatModule
@@ -108,7 +131,7 @@ export class UserStatsService {
         .lean();
       return sortedUserByPoints;
     } catch (error) {
-      if (error instanceof Error) throw new Error(error.message);
+      if (error instanceof Error) throw new Error(`error in getAllUsersSorted of userStat module ${error.message}`);
     }
   }
   async updateRanksBatch(users: UserStat[], startIndex: number) {
@@ -134,7 +157,7 @@ export class UserStatsService {
         await this.userStatModule.bulkWrite(bulkOps);
       }
     } catch (error) {
-      if (error instanceof Error) throw new Error(error.message);
+      if (error instanceof Error) throw new Error(`error in updateRanksBatch of userStat module ${error.message}`);
     }
   }
 }

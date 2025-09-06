@@ -15,13 +15,14 @@ import { SessionGuard } from 'src/sessiontoken/session.guard';
 import { getFailureResponse } from 'src/utils';
 import { UpdateUserDto } from './dto/update-userStat.dto';
 import { UpdateOnlineStatusDto } from './dto/update-onlinestatus.dto';
+import { Types } from 'mongoose';
 
 @Controller('user-stats')
 export class UserStatsController {
   constructor(private readonly userstateService: UserStatsService) {}
   @UseGuards(AuthGuard, SessionGuard)
   @Post('create')
-  async create(@Body() userId: string) {
+  async create(@Body() userId: Types.ObjectId) {
     try {
       return await this.userstateService.create(userId);
     } catch (error) {
@@ -47,7 +48,7 @@ export class UserStatsController {
   @UseGuards(AuthGuard, SessionGuard)
   @Put(':userId')
   async updateStats(
-    @Param('userId') id: string,
+    @Param('userId') id: Types.ObjectId,
     @Body() updateUserStatDTO: UpdateUserDto,
   ) {
     try {

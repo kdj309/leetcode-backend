@@ -10,13 +10,13 @@ export class Submission {
     userId: User;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Problem' })
-    problemId: Problem;
+    problemId: mongoose.Types.ObjectId;
 
     @Prop({ required: true })
     status: string;
 
     @Prop({ required: true })
-    langaugeId: string;
+    languageId: number;
 
     @Prop({ required: true })
     code: string;
@@ -29,5 +29,17 @@ export class Submission {
 
     @Prop()
     submittedAt: Date;
+
+    @Prop()
+    input:string
+
+    @Prop()
+    expected_output:string
+
+    @Prop()
+    actual_output:string
+
+    @Prop()
+    submissionId:string
 }
 export const SubmissionSchema = SchemaFactory.createForClass(Submission);

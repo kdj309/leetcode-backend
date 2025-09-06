@@ -3,7 +3,7 @@ import { createUser } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user-dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/Schemas/user.schema';
-import { Model, ObjectId, Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { getSuccessResponse } from 'src/utils';
 import { submission } from 'src/interfaces/config.interface';
@@ -23,7 +23,7 @@ export class UsersService {
     return await this.userModel.find();
   }
 
-  async getUser(id: ObjectId) {
+  async getUser(id: Types.ObjectId) {
     const user = await this.userModel.findById(
       id,
       '-_password -hashedpassword',
@@ -47,7 +47,7 @@ export class UsersService {
     try {
       const user = await this.userModel.findOne({ email: userData.email });
       if (!user) {
-        const newuser = new this.userModel(userData);
+        const newuser = new this.userModel({...userData,submissions:[]});
         const payload = { sub: newuser.id, username: newuser.username };
         await newuser.save();
         const sessiontoken = await this.sessionService.createToken(newuser._id);
@@ -63,11 +63,11 @@ export class UsersService {
           'User Created Successfully',
         );
       } else {
-        return 'User Already Exists';
+        return getSuccessResponse(null,'User Already Exists');
       }
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(error.message);
+        throw new Error(`error in createUser of UserService ${error.message}`);
       }
     }
   }
@@ -86,7 +86,7 @@ export class UsersService {
       }
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(error.message);
+        throw new Error(`error in updateUser of UserService ${error.message}`);
       }
     }
   }
@@ -113,7 +113,7 @@ export class UsersService {
       }
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(error.message);
+        throw new Error(`error in addSubmission of UserService ${error.message}`);
       }
     }
   }

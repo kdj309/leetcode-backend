@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsIn, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class CreateSubmissionDto {
   @ApiProperty({
@@ -9,7 +10,7 @@ export class CreateSubmissionDto {
   })
   @IsNotEmpty()
   @IsMongoId()
-  userId: string;
+  userId: Types.ObjectId;
 
   @ApiProperty({
     type: String,
@@ -18,7 +19,7 @@ export class CreateSubmissionDto {
   })
   @IsNotEmpty()
   @IsMongoId()
-  problemId: string;
+  problemId: Types.ObjectId;
 
   @ApiProperty({
     type: String,
@@ -32,11 +33,11 @@ export class CreateSubmissionDto {
   @ApiProperty({
     type: String,
     description: 'The language ID used for the submission.',
-    example: 'python',
+    example: 93,
   })
   @IsNotEmpty()
-  @IsString()
-  langaugeId: string;
+  @IsNumber()
+  languageId: number;
 
   @ApiProperty({
     type: String,
@@ -52,7 +53,7 @@ export class CreateSubmissionDto {
     description: 'The execution time of the submission in milliseconds.',
     example: 123,
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   executionTime: number;
 
@@ -75,4 +76,16 @@ export class CreateSubmissionDto {
   })
   @IsOptional()
   submittedAt?: Date;
+
+  @IsNotEmpty()
+  input?:string
+
+  @IsOptional()
+  expected_output?:string
+
+  @IsOptional()
+  actual_output?:string
+
+  @IsOptional()
+  submissionId?:string
 }

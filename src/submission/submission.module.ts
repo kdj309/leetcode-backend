@@ -5,10 +5,12 @@ import { SubmissionController } from './submission.controller';
 import { SubmissionService } from './submission.service';
 import { AuthModule } from 'src/auth/auth.module';
 import { SessiontokenModule } from 'src/sessiontoken/sessiontoken.module';
+import { User } from 'src/Schemas/user.schema';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Submission.name, schema: SubmissionSchema }]),
+    MongooseModule.forFeature([{name:User.name,schema:User}]),
     AuthModule,
     SessiontokenModule,
   ],

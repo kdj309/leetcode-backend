@@ -24,7 +24,7 @@ import { QueueModule } from './queue/queue.module';
     SubmissionModule,
     UserStatsModule,
     LeaderboardCacheModule,
-    QueueModule
+    QueueModule,
   ],
   controllers: [AppController],
   providers: [AppService],
