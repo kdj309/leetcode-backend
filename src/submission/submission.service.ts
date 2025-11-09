@@ -8,6 +8,7 @@ import { SubmissionFilters } from 'src/interfaces/config.interface';
 import { User } from 'src/Schemas/user.schema';
 import batchwiseSubmission from 'src/services/batchwiseSubmission';
 import { UpdateSubmissionDTO } from './dto/update-submissionstatusdto';
+import submitCode from 'src/services/sumbitCode';
 interface IBatchSubmissionDTO extends UpdateSubmissionDTO {
   submissionId: Types.ObjectId;
 }
@@ -20,44 +21,46 @@ export class SubmissionService {
 
   async createSubmission(createSubmissionDTO: CreateSubmissionDto) {
     try {
-      const submission = new this.submissionModule({
-        ...createSubmissionDTO,
-        status: 'PENDING',
+      const response = await submitCode({
+        source_code: createSubmissionDTO.source_code,
+        expected_output: createSubmissionDTO.expected_output,
+        stdin: createSubmissionDTO.stdin,
+        language_id: createSubmissionDTO.language_id,
       });
-      submission.problemId
-      const userUpdatedSubmissions = await this.userModule.findByIdAndUpdate(
-        createSubmissionDTO.userId,
-        { $push: { submissions: submission.id } },
-      );
-      await submission.save();
-      return getSuccessResponse(submission, 'Problem submitted Succesfully');
+      return getSuccessResponse(response.data?.token, 'Problem submitted Succesfully');
     } catch (error) {
       if (error instanceof Error)
         throw new Error(`[createSubmission] ${error.message}`);
     }
   }
 
-  async createSubmissions(submissions: CreateSubmissionDto[]) {
+  async createSubmissions( userId: Types.ObjectId,submissions: CreateSubmissionDto[]) {
     try {
-      const submissionsWithStatus = await submissions.map((s) => ({
-        ...s,
-        status: 'PENDING',
-        actual_output: '',
-      }));
       const judgeSubmissions = submissions.map((s) => ({
-        language_id: s.languageId,
-        stdin: s.input,
-        source_code: s.code,
+        language_id: s.language_id,
+        stdin: s.stdin,
+        source_code: s.source_code,
         expected_output: s.expected_output,
       }));
       const judgeResponses = await batchwiseSubmission(judgeSubmissions);
-      const submissionsData = judgeResponses.map((s, index) => ({
-        ...submissionsWithStatus[index],
-        submissionId: s.token,
-      }));
-      const dbResults = await this.submissionModule.insertMany(submissionsData);
+      const dbResults = new this.submissionModule({
+        code:submissions[0].source_code,
+        input:submissions.map((s)=>s.stdin),
+        languageId:submissions[0].language_id,
+        problemId:submissions[0].problemId,
+        expected_output:submissions.map((s)=>s.expected_output),
+        status:'PENDING',
+        userId,
+        submissionId:judgeResponses.map((r)=>r.token),
+        submittedAt:new Date(),
+        actual_output:submissions.map((s)=>''),
+        executionTime:0,
+        memoryUsed:0
+      });
+      await dbResults.save()
+      const dbResultObj=dbResults.toObject()
       return getSuccessResponse(
-        dbResults,
+        {...dbResultObj,submissionIds:judgeResponses.map((judgeResponse)=>judgeResponse.token)},
         'Successfully submitted batch submission',
       );
     } catch (error) {

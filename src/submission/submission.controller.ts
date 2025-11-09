@@ -28,30 +28,22 @@ export class SubmissionController {
   @Post('users/:userId/submissions')
   async create(@Param('userId') userId: Types.ObjectId,@Body() submissionDTO: CreateSubmissionDto) {
     try {
-      const response = await submitCode({
-        code: submissionDTO.code,
-        expected_output: submissionDTO.expected_output,
-        input: submissionDTO.input,
-        language_id: submissionDTO.languageId,
-      });
-      const submission = await this.submissionService.createSubmission({
-        ...submissionDTO,
-        submissionId: response.data?.token,
-        actual_output: '',
-      });
+
+      const submission = await this.submissionService.createSubmission(submissionDTO);
 
       return submission;
     } catch (error) {
+      console.log(error)
       return getFailureResponse(error.message);
     }
   }
 
   @UseGuards(AuthGuard, SessionGuard)
   @Post('users/:userId/submissions/batch')
-  async multiSubmit(@Body() submissions: CreateSubmissionDto[]) {
+  async multiSubmit(@Param('userId') userId: Types.ObjectId,@Body() submissionsData: {submissions:CreateSubmissionDto[]}) {
     try {
       const submissionsResponses =
-        await this.submissionService.createSubmissions(submissions);
+        await this.submissionService.createSubmissions(userId,submissionsData.submissions);
       return submissionsResponses;
     } catch (error) {
       return getFailureResponse(error.message);

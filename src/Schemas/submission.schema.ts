@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
 import { User } from './user.schema';
-import { Problem } from './problem.schema';
 
 @Schema({ timestamps: true })
 export class Submission {
@@ -21,25 +20,22 @@ export class Submission {
     @Prop({ required: true })
     code: string;
 
-    @Prop({ required: true })
-    executionTime: number;
+    @Prop({ required: false,default:"0" })
+    executionTime: string[];
 
     @Prop()
-    memoryUsed: number;
+    memoryUsed: number[];
 
     @Prop()
     submittedAt: Date;
 
     @Prop()
-    input:string
+    input:string[]
 
     @Prop()
-    expected_output:string
+    expected_output:string[]
 
     @Prop()
-    actual_output:string
-
-    @Prop()
-    submissionId:string
+    actual_output:string[]
 }
 export const SubmissionSchema = SchemaFactory.createForClass(Submission);

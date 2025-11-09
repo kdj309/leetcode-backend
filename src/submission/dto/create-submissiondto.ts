@@ -37,7 +37,7 @@ export class CreateSubmissionDto {
   })
   @IsNotEmpty()
   @IsNumber()
-  languageId: number;
+  language_id: number;
 
   @ApiProperty({
     type: String,
@@ -46,7 +46,7 @@ export class CreateSubmissionDto {
   })
   @IsNotEmpty()
   @IsString()
-  code: string;
+  source_code: string;
 
   @ApiProperty({
     type: Number,
@@ -78,7 +78,7 @@ export class CreateSubmissionDto {
   submittedAt?: Date;
 
   @IsNotEmpty()
-  input?:string
+  stdin?:string
 
   @IsOptional()
   expected_output?:string
