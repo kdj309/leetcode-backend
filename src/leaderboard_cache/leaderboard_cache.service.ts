@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import Redis from 'ioredis';
+import { RedisClientType } from 'redis';
 import { Model } from 'mongoose';
 import { LeadBoardCache } from 'src/Schemas/leaderboardcache.schema';
 import { UserStat } from 'src/Schemas/userstat.schema';
@@ -15,8 +15,8 @@ export class LeaderboardCacheService {
   constructor(
     @InjectModel(LeadBoardCache.name)
     private LeadboardCacheModule: Model<LeadBoardCache>,
-    @Inject('REDIS_CLIENT') private readonly redis: Redis,
-  ) {}
+    @Inject('REDIS_CLIENT') private readonly redis: RedisClientType,
+  ) { }
   private readonly CACHE_TTL_SECONDS = 3600; // 1 hour
   private readonly CACHE_TTL_MS = this.CACHE_TTL_SECONDS * 1000;
   async create(leaderboardData: UserStat[]) {
@@ -28,21 +28,25 @@ export class LeaderboardCacheService {
         .set(
           this.CACHE_KEYS.GLOBAL_LEADERBOARD,
           JSON.stringify(leaderboardData),
-          'EX',
-          this.CACHE_TTL_SECONDS,
+          { EX: this.CACHE_TTL_SECONDS },
         )
         .set(
           this.CACHE_KEYS.LAST_UPDATE,
           new Date().toISOString(),
-          'EX',
-          this.CACHE_TTL_SECONDS,
+          { EX: this.CACHE_TTL_SECONDS },
         )
         .exec();
+      await this.LeadboardCacheModule.deleteMany({
+        generatedAt: { $lt: new Date(Date.now() - this.CACHE_TTL_MS) }
+      });
+
       const leaderboardCache = new this.LeadboardCacheModule({
-        rankings: leaderboardData,
+        cacheKey: this.CACHE_KEYS.GLOBAL_LEADERBOARD,
+        userCount: leaderboardData.length,
         generatedAt: new Date(),
         expiresAt,
       });
+
       await leaderboardCache.save();
       return {
         success: true,
@@ -54,23 +58,34 @@ export class LeaderboardCacheService {
     }
   }
   async invalidateCache(): Promise<void> {
+
     try {
-      await this.redis
-        .multi()
-        .del(this.CACHE_KEYS.GLOBAL_LEADERBOARD)
-        .del(this.CACHE_KEYS.USER_RANKINGS)
-        .del(this.CACHE_KEYS.LAST_UPDATE)
-        .exec();
+      const pipeline = this.redis.multi();
+
+      pipeline.del(this.CACHE_KEYS.GLOBAL_LEADERBOARD);
+      pipeline.del(this.CACHE_KEYS.USER_RANKINGS);
+      pipeline.del(this.CACHE_KEYS.LAST_UPDATE);
+      const results = await pipeline.exec();
+
+      await this.LeadboardCacheModule.updateOne(
+        { cacheKey: this.CACHE_KEYS.GLOBAL_LEADERBOARD },
+        { $set: { expiresAt: new Date() } }
+      );
+      console.log('✅ Cache invalidated successfully');
     } catch (error) {
       throw new Error(`Failed to invalidate cache: ${error.message}`);
     }
   }
-  async getLeaderboard(): Promise<UserStat[]> {
+  async getLeaderboard(): Promise<UserStat[] | null> {
     try {
       const cached = await this.redis.get(this.CACHE_KEYS.GLOBAL_LEADERBOARD);
+      if (!cached || typeof cached !== 'string') {
+        return null;
+      }
       return cached ? JSON.parse(cached) : null;
     } catch (error) {
-      throw new Error(`Failed to get leaderboard from cache: ${error.message}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to get leaderboard from cache: ${errorMessage}`);
     }
   }
 }

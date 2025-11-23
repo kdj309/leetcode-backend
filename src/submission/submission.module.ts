@@ -6,6 +6,7 @@ import { SubmissionService } from './submission.service';
 import { AuthModule } from 'src/auth/auth.module';
 import { SessiontokenModule } from 'src/sessiontoken/sessiontoken.module';
 import { User } from 'src/Schemas/user.schema';
+import { UserStatsModule } from 'src/user_stats/user_stats.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { User } from 'src/Schemas/user.schema';
     MongooseModule.forFeature([{name:User.name,schema:User}]),
     AuthModule,
     SessiontokenModule,
+    UserStatsModule
   ],
   controllers: [SubmissionController],
   providers: [SubmissionService],

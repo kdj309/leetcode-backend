@@ -1,4 +1,4 @@
-import { Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { LeaderboardCacheService } from './leaderboard_cache.service';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
@@ -87,10 +87,8 @@ export class LeaderboardCacheController {
   @Post('create')
   async createLeaderboardCache() {
     try {
-      // Get fresh leaderboard data
       const leaderboardData = await this.userStatService.getAllUsersSorted();
 
-      // Create cache with the fresh data
       const result = await this.leaderBoardService.create(leaderboardData);
 
       return getSuccessResponse(
@@ -101,4 +99,33 @@ export class LeaderboardCacheController {
       return getFailureResponse(error);
     }
   }
+@Get('user/:userId/position')
+async getUserPosition(@Param('userId') userId: string) {
+  try {
+    const userStats = await this.userStatService.findByUserId(userId);
+    
+    if (!userStats || userStats.data.totalPoints === 0) {
+      return getSuccessResponse({
+        ranked: false,
+        totalPoints: 0,
+        totalSolved: 0,
+        message: 'Solve your first problem to get ranked!',
+      }, 'User not ranked yet');
+    }
+
+    const totalRankedUsers = await this.userStatService.countRankedUsers();
+    
+    return getSuccessResponse({
+      ranked: true,
+      currentRank: userStats.data.currentRank,
+      totalPoints: userStats.data.totalPoints,
+      totalSolved: userStats.data.totalSolved,
+      totalRankedUsers,
+      percentile: ((totalRankedUsers - userStats.data.currentRank) / totalRankedUsers * 100).toFixed(1),
+    }, 'User position retrieved');
+    
+  } catch (error) {
+    return getFailureResponse(error);
+  }
+}
 }

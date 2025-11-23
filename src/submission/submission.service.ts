@@ -9,6 +9,7 @@ import { User } from 'src/Schemas/user.schema';
 import batchwiseSubmission from 'src/services/batchwiseSubmission';
 import { UpdateSubmissionDTO } from './dto/update-submissionstatusdto';
 import submitCode from 'src/services/sumbitCode';
+import { UserStatsService } from 'src/user_stats/user_stats.service';
 interface IBatchSubmissionDTO extends UpdateSubmissionDTO {
   submissionId: Types.ObjectId;
 }
@@ -17,6 +18,7 @@ export class SubmissionService {
   constructor(
     @InjectModel(Submission.name) private submissionModule: Model<Submission>,
     @InjectModel(User.name) private userModule: Model<User>,
+     private userStatsService: UserStatsService,
   ) {}
 
   async createSubmission(createSubmissionDTO: CreateSubmissionDto) {
@@ -58,7 +60,12 @@ export class SubmissionService {
         memoryUsed:0
       });
       await dbResults.save()
-      const dbResultObj=dbResults.toObject()
+      const dbResultObj=dbResults.toObject();
+      await this.userModule.updateOne(
+        { _id: userId },
+        { $addToSet: { submissions: dbResults._id } },
+      );
+      await this.userStatsService.create(userId);
       return getSuccessResponse(
         {...dbResultObj,submissionIds:judgeResponses.map((judgeResponse)=>judgeResponse.token)},
         'Successfully submitted batch submission',
@@ -90,11 +97,14 @@ export class SubmissionService {
     updateBody: UpdateSubmissionDTO,
   ) {
     try {
+      if (updateBody.status.toUpperCase() === 'ACCEPTED') {
+       await this.userStatsService.updateStats(userId,updateBody.difficulty,updateBody.problemId)
+      }
       const updatedSubmission = await this.submissionModule.findByIdAndUpdate(
         submissionId,
         {
           $set: {
-            status: updateBody.status,
+            status: updateBody.status.toUpperCase(),
             actual_output: updateBody?.actual_output,
             executionTime: updateBody?.executionTime,
             memoryUsed: updateBody?.memoryUsed,
@@ -102,14 +112,14 @@ export class SubmissionService {
         },
         { new: true },
       );
+
       return updatedSubmission;
     } catch (error) {
       if (error instanceof Error)
-        throw new Error(`[updateSubmissionStatus] ${error.message}`);
+        throw new Error(`[updateStats] ${error.message}`);
     }
   }
 
-  // Batch update method
   async updateSubmissionsBatch(batchUpdateBody: IBatchSubmissionDTO[]) {
     try {
       const bulkOperations = batchUpdateBody.map((update) => ({
