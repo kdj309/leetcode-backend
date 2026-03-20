@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Controller, DefaultValuePipe, Get, Param, ParseIntPipe, Post, Query, UseGuards } from '@nestjs/common';
 import { LeaderboardCacheService } from './leaderboard_cache.service';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
@@ -8,30 +8,59 @@ import { getFailureResponse, getSuccessResponse } from 'src/utils';
 import { LeaderboardJobs } from 'src/interfaces/config.interface';
 import { UserStatsService } from 'src/user_stats/user_stats.service';
 
-@Controller('leaderboard-cache')
+@Controller('leaderboard')
 export class LeaderboardCacheController {
   constructor(
     private readonly leaderBoardService: LeaderboardCacheService,
     private readonly userStatService: UserStatsService,
     @InjectQueue('leaderboard') private leaderBoardQueue: Queue,
-  ) {}
+  ) { }
+  private paginateData(data: any[], page: number, limit: number) {
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedData = data.slice(startIndex, endIndex);
 
+    return {
+      users: paginatedData,
+      pagination: {
+        page,
+        limit,
+        totalUsers: data.length,
+        totalPages: Math.ceil(data.length / limit),
+        hasNextPage: endIndex < data.length,
+        hasPrevPage: page > 1,
+      },
+    };
+  }
   @UseGuards(AuthGuard, SessionGuard)
-  @Get()
-  async getLeaderBoard() {
+  @Get('paginated')
+  async getLeaderBoard(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(50), ParseIntPipe) limit: number,
+  ) {
     try {
-      const cachedData = await this.leaderBoardService.getLeaderboard();
-      if (cachedData) {
-        return getSuccessResponse(cachedData, 'Cached leaderboard data');
+      if (page < 1) page = 1;
+      if (limit < 1 || limit > 100) limit = 50;
+      const result = await this.leaderBoardService.getLeaderboardPaginated(page, limit);
+      if (!result) {
+        const stats = await this.userStatService.getAllUsersSorted();
+        this.leaderBoardService.create(stats).catch(err => {
+          console.error('Failed to create cache:', err);
+        });
+
+        return getSuccessResponse(
+          this.paginateData(stats, page, limit),
+          'Fresh leaderboard data from database'
+        );
       }
-      const stats = await this.userStatService.getAllUsersSorted();
-      await this.leaderBoardService.create(stats);
-      
-      return getSuccessResponse(stats, 'Returns the cached leaderboard data');
+
+      return getSuccessResponse(result, 'Cached leaderboard data');
     } catch (error) {
       return getFailureResponse(error);
     }
   }
+
+
 
   @UseGuards(AuthGuard, SessionGuard)
   @Post('refresh')
@@ -99,33 +128,34 @@ export class LeaderboardCacheController {
       return getFailureResponse(error);
     }
   }
-@Get('user/:userId/position')
-async getUserPosition(@Param('userId') userId: string) {
-  try {
-    const userStats = await this.userStatService.findByUserId(userId);
-    
-    if (!userStats || userStats.data.totalPoints === 0) {
-      return getSuccessResponse({
-        ranked: false,
-        totalPoints: 0,
-        totalSolved: 0,
-        message: 'Solve your first problem to get ranked!',
-      }, 'User not ranked yet');
-    }
+  @Get('user/:userId/position')
+  async getUserPosition(@Param('userId') userId: string) {
+    try {
+      const userStats = await this.userStatService.findByUserId(userId);
 
-    const totalRankedUsers = await this.userStatService.countRankedUsers();
-    
-    return getSuccessResponse({
-      ranked: true,
-      currentRank: userStats.data.currentRank,
-      totalPoints: userStats.data.totalPoints,
-      totalSolved: userStats.data.totalSolved,
-      totalRankedUsers,
-      percentile: ((totalRankedUsers - userStats.data.currentRank) / totalRankedUsers * 100).toFixed(1),
-    }, 'User position retrieved');
-    
-  } catch (error) {
-    return getFailureResponse(error);
+      if (!userStats || userStats.data.totalPoints === 0) {
+        return getSuccessResponse({
+          ranked: false,
+          totalPoints: 0,
+          totalSolved: 0,
+          message: 'Solve your first problem to get ranked!',
+        }, 'User not ranked yet');
+      }
+
+      const totalRankedUsers = await this.userStatService.countRankedUsers();
+
+      return getSuccessResponse({
+        ranked: true,
+        currentRank: userStats.data.currentRank,
+        totalPoints: userStats.data.totalPoints,
+        totalSolved: userStats.data.totalSolved,
+        totalRankedUsers,
+        percentile: ((totalRankedUsers - userStats.data.currentRank) / totalRankedUsers * 100).toFixed(1),
+      }, 'User position retrieved');
+
+    } catch (error) {
+      return getFailureResponse(error);
+    }
   }
-}
+
 }

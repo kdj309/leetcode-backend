@@ -95,7 +95,7 @@ export class SubmissionController {
   }
 
   @UseGuards(AuthGuard, SessionGuard)
-  @Get(':userId/:problemId')
+  @Get('users/:userId/problems/:problemId')
   async getProblemSubmissions(
     @Param('userId') userId: Types.ObjectId,
     @Param('problemId') problemId: Types.ObjectId,
@@ -111,7 +111,7 @@ export class SubmissionController {
     }
   }
   @UseGuards(AuthGuard, SessionGuard)
-  @Get(':userId')
+  @Get('users/:userId/submissions')
   async getSubmissionsByUser(
     @Param('userId') userId: Types.ObjectId,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,

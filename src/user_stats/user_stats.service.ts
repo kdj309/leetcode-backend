@@ -13,7 +13,7 @@ export class UserStatsService {
     @InjectModel(UserStat.name) private userStatModule: Model<UserStat>,
     @InjectModel(Submission.name) private submissionModule: Model<Submission>,
     @InjectQueue('leaderboard') private leaderboardQueue: Queue
-  ) {}
+  ) { }
   async create(userId: Types.ObjectId) {
     const defaultStats = {
       userId,
@@ -88,21 +88,21 @@ export class UserStatsService {
         { upsert: true },
       );
       await this.leaderboardQueue.add(
-          LeaderboardJobs.RECALCULATE_ALL_RANKS,
-          { 
-            triggeredBy: userId,
-            reason: 'accepted_submission' 
+        LeaderboardJobs.RECALCULATE_ALL_RANKS,
+        {
+          triggeredBy: userId,
+          reason: 'accepted_submission'
+        },
+        {
+          priority: 5,
+          attempts: 3,
+          backoff: {
+            type: 'exponential',
+            delay: 2000,
           },
-          {
-            priority: 5,
-            attempts: 3,
-            backoff: {
-              type: 'exponential',
-              delay: 2000,
-            },
-            jobId: `rank-calc-${Date.now()}`,
-          }
-        );
+          jobId: `rank-calc-${Date.now()}`,
+        }
+      );
       console.log('Update Stats Response:', response);
       return response;
     } catch (error) {
@@ -141,14 +141,15 @@ export class UserStatsService {
       if (error instanceof Error) throw new Error(`error in updateOnlineStatus of UserStat module ${error.message}`);
     }
   }
-  async getAllUsersSorted(includeZeroPoints=false) {
-    const query = includeZeroPoints 
-    ? {} 
-    : { totalPoints: { $gt: 0 } }; 
+  async getAllUsersSorted(includeZeroPoints = false) {
+    const query = includeZeroPoints
+      ? {}
+      : { totalPoints: { $gt: 0 } };
 
     try {
       const sortedUserByPoints = await this.userStatModule
         .find(query)
+        .populate('userId','username')
         .sort({ totalPoints: -1, lastUpdated: -1 })
         .lean();
       return sortedUserByPoints;
@@ -183,8 +184,37 @@ export class UserStatsService {
     }
   }
   async countRankedUsers(): Promise<number> {
-  return await this.userStatModule.countDocuments({
-    totalPoints: { $gt: 0 }
-  });
+    return await this.userStatModule.countDocuments({
+      totalPoints: { $gt: 0 }
+    });
+
+  }
+async getAllUsersSortedPaginated(page: number, limit: number) {
+  const skip = (page - 1) * limit;
+  
+  const [users, totalCount] = await Promise.all([
+    this.userStatModule
+      .find({ totalPoints: { $gt: 0 } }) 
+      .sort({ totalPoints: -1, lastUpdated: 1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('userId', 'username email')
+      .lean()
+      .exec(),
+    
+    this.userStatModule.countDocuments({ totalPoints: { $gt: 0 } })
+  ]);
+  
+  return {
+    users,
+    pagination: {
+      page,
+      limit,
+      totalUsers: totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+      hasNextPage: skip + limit < totalCount,
+      hasPrevPage: page > 1,
+    },
+  };
 }
 }

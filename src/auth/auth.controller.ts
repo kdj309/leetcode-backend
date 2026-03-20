@@ -3,6 +3,7 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  HttpException,
   Post,
   Req,
   Res,
@@ -133,6 +134,12 @@ export class AuthController {
   async createRefreshToken(@Req() request: Request, @Res() response: Response) {
     try {
       const refreshToken = request.cookies['refresh-token'];
+      if (!refreshToken) {
+        throw new HttpException(
+          'Refresh Token is required!',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       const newtokenresponse = await this.authService.verifyAndGenerateNewToken(
         refreshToken,
       );
@@ -154,7 +161,13 @@ export class AuthController {
       delete newtokenresponse.data.accessToken;
       response.json(newtokenresponse);
     } catch (error) {
-      throw error;
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        error?.message || 'Token refresh failed',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 

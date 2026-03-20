@@ -88,4 +88,31 @@ export class LeaderboardCacheService {
       throw new Error(`Failed to get leaderboard from cache: ${errorMessage}`);
     }
   }
+  async getLeaderboardPaginated(page: number, limit: number) {
+    try {
+      const cached = await this.getLeaderboard();
+      if (!cached) {
+        return null;
+      }
+
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      const paginatedData = cached.slice(startIndex, endIndex);
+
+      return {
+        users: paginatedData,
+        pagination: {
+          page,
+          limit,
+          totalUsers: cached.length,
+          totalPages: Math.ceil(cached.length / limit),
+          hasNextPage: endIndex < cached.length,
+          hasPrevPage: page > 1,
+        },
+      };
+    } catch (error) {
+      console.error('Error getting paginated leaderboard:', error);
+      return null;
+    }
+  }
 }
