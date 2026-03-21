@@ -16,7 +16,7 @@ import { config } from 'src/config/config';
         commandTimeout: 30000,
         connectTimeout: 30000,
         keepAlive: 30000,
-        lazyConnect: false
+        lazyConnect: false,
       },
     }),
     BullModule.registerQueue({
@@ -25,7 +25,7 @@ import { config } from 'src/config/config';
   ],
   providers: [
     {
-      provide: "REDIS_CLIENT",
+      provide: 'REDIS_CLIENT',
       useFactory: async () => {
         const redisConnection = createClient({
           password: config().redis.password,
@@ -39,7 +39,8 @@ import { config } from 'src/config/config';
               return Math.min(retries * 100, 3000);
             },
             connectTimeout: 30000,
-          }, commandsQueueMaxLength: 1000
+          },
+          commandsQueueMaxLength: 1000,
         });
         await redisConnection.connect();
 
@@ -64,9 +65,9 @@ import { config } from 'src/config/config';
           console.log('🔌 Redis Client Connection Closed');
         });
         return redisConnection;
-      }
-    }
+      },
+    },
   ],
-  exports: [BullModule, "REDIS_CLIENT"],
+  exports: [BullModule, 'REDIS_CLIENT'],
 })
-export class QueueModule { }
+export class QueueModule {}

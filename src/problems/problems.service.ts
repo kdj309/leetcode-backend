@@ -17,7 +17,8 @@ export class ProblemsService {
       await problem.save();
       return getSuccessResponse(problem, 'Problem Created Succesfully');
     } catch (error) {
-      if (error instanceof Error) throw new Error(`error in problem create method ${error.message}`);
+      if (error instanceof Error)
+        throw new Error(`error in problem create method ${error.message}`);
     }
 
     return 'Problem saved successfully';
@@ -32,7 +33,8 @@ export class ProblemsService {
         );
       return getSuccessResponse(problems, 'Fetched all problems');
     } catch (error) {
-      if (error instanceof Error) throw new Error(`error in problems findall method ${error.message}`);
+      if (error instanceof Error)
+        throw new Error(`error in problems findall method ${error.message}`);
     }
   }
 
@@ -44,7 +46,8 @@ export class ProblemsService {
       }
       return getSuccessResponse(problem, 'Successfully fetched the problem');
     } catch (error) {
-      if (error instanceof Error) throw new Error(`error in problrm findone method ${error.message}`);
+      if (error instanceof Error)
+        throw new Error(`error in problrm findone method ${error.message}`);
     }
   }
 
@@ -62,7 +65,8 @@ export class ProblemsService {
       }
       return getSuccessResponse(problem, 'Successfully updated the problem');
     } catch (error) {
-      if (error instanceof Error) throw new Error(`error in problem update method ${error.message}`);
+      if (error instanceof Error)
+        throw new Error(`error in problem update method ${error.message}`);
     }
   }
 
@@ -74,7 +78,8 @@ export class ProblemsService {
         'Problem deleted successfully',
       );
     } catch (error) {
-      if (error instanceof Error) throw new Error(`error in problem remove method ${error.message}`);
+      if (error instanceof Error)
+        throw new Error(`error in problem remove method ${error.message}`);
     }
   }
 }

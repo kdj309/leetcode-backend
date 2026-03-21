@@ -5,15 +5,35 @@ import { Queue } from 'bullmq';
 import { Model, Types } from 'mongoose';
 import { LeaderboardJobs } from 'src/interfaces/config.interface';
 import { Submission } from 'src/Schemas/submission.schema';
+import { User } from 'src/Schemas/user.schema';
 import { UserStat } from 'src/Schemas/userstat.schema';
 import { getSuccessResponse } from 'src/utils';
+
 @Injectable()
 export class UserStatsService {
   constructor(
     @InjectModel(UserStat.name) private userStatModule: Model<UserStat>,
     @InjectModel(Submission.name) private submissionModule: Model<Submission>,
-    @InjectQueue('leaderboard') private leaderboardQueue: Queue
-  ) { }
+    @InjectModel(User.name) private userModule: Model<User>,
+    @InjectQueue('leaderboard') private leaderboardQueue: Queue,
+  ) {}
+  private paginateData(data: any[], page: number, limit: number) {
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedData = data.slice(startIndex, endIndex);
+
+    return {
+      users: paginatedData,
+      pagination: {
+        page,
+        limit,
+        totalUsers: data.length,
+        totalPages: Math.ceil(data.length / limit),
+        hasNextPage: endIndex < data.length,
+        hasPrevPage: page > 1,
+      },
+    };
+  }
   async create(userId: Types.ObjectId) {
     const defaultStats = {
       userId,
@@ -51,6 +71,7 @@ export class UserStatsService {
   ) {
     const userObjectId =
       typeof userId === 'string' ? new Types.ObjectId(userId) : userId;
+    const user = await this.userModule.findById(userId, 'username');
 
     const problemObjectId = new Types.ObjectId(problemId);
     try {
@@ -79,6 +100,7 @@ export class UserStatsService {
           previousRank: 0,
           isOnline: false,
           lastSeen: new Date(),
+          userName: user.username,
         },
       };
 
@@ -91,7 +113,7 @@ export class UserStatsService {
         LeaderboardJobs.RECALCULATE_ALL_RANKS,
         {
           triggeredBy: userId,
-          reason: 'accepted_submission'
+          reason: 'accepted_submission',
         },
         {
           priority: 5,
@@ -101,7 +123,7 @@ export class UserStatsService {
             delay: 2000,
           },
           jobId: `rank-calc-${Date.now()}`,
-        }
+        },
       );
       console.log('Update Stats Response:', response);
       return response;
@@ -138,23 +160,26 @@ export class UserStatsService {
         'Successfully updated the userstat',
       );
     } catch (error) {
-      if (error instanceof Error) throw new Error(`error in updateOnlineStatus of UserStat module ${error.message}`);
+      if (error instanceof Error)
+        throw new Error(
+          `error in updateOnlineStatus of UserStat module ${error.message}`,
+        );
     }
   }
   async getAllUsersSorted(includeZeroPoints = false) {
-    const query = includeZeroPoints
-      ? {}
-      : { totalPoints: { $gt: 0 } };
+    const query = includeZeroPoints ? {} : { totalPoints: { $gt: 0 } };
 
     try {
       const sortedUserByPoints = await this.userStatModule
         .find(query)
-        .populate('userId','username')
         .sort({ totalPoints: -1, lastUpdated: -1 })
         .lean();
       return sortedUserByPoints;
     } catch (error) {
-      if (error instanceof Error) throw new Error(`error in getAllUsersSorted of userStat module ${error.message}`);
+      if (error instanceof Error)
+        throw new Error(
+          `error in getAllUsersSorted of userStat module ${error.message}`,
+        );
     }
   }
   async updateRanksBatch(users: UserStat[], startIndex: number) {
@@ -180,41 +205,113 @@ export class UserStatsService {
         await this.userStatModule.bulkWrite(bulkOps);
       }
     } catch (error) {
-      if (error instanceof Error) throw new Error(`error in updateRanksBatch of userStat module ${error.message}`);
+      if (error instanceof Error)
+        throw new Error(
+          `error in updateRanksBatch of userStat module ${error.message}`,
+        );
+    }
+  }
+  getTimeFilter(period: string) {
+    const now = new Date();
+
+    switch (period) {
+      case 'today':
+        return { $gte: new Date(now.setHours(0, 0, 0, 0)) };
+      case 'week':
+        return { $gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) };
+      case 'month':
+        return { $gte: new Date(now.setDate(1)) };
+      default:
+        return {};
     }
   }
   async countRankedUsers(): Promise<number> {
     return await this.userStatModule.countDocuments({
-      totalPoints: { $gt: 0 }
+      totalPoints: { $gt: 0 },
     });
-
   }
-async getAllUsersSortedPaginated(page: number, limit: number) {
-  const skip = (page - 1) * limit;
-  
-  const [users, totalCount] = await Promise.all([
-    this.userStatModule
-      .find({ totalPoints: { $gt: 0 } }) 
-      .sort({ totalPoints: -1, lastUpdated: 1 })
-      .skip(skip)
-      .limit(limit)
-      .populate('userId', 'username email')
-      .lean()
-      .exec(),
-    
-    this.userStatModule.countDocuments({ totalPoints: { $gt: 0 } })
-  ]);
-  
-  return {
-    users,
-    pagination: {
-      page,
-      limit,
-      totalUsers: totalCount,
-      totalPages: Math.ceil(totalCount / limit),
-      hasNextPage: skip + limit < totalCount,
-      hasPrevPage: page > 1,
-    },
-  };
-}
+  async getAllUsersSortedPaginated(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+
+    const [users, totalCount] = await Promise.all([
+      this.userStatModule
+        .find({ totalPoints: { $gt: 0 } })
+        .sort({ totalPoints: -1, lastUpdated: 1 })
+        .skip(skip)
+        .limit(limit)
+        .populate('userId', 'username email')
+        .lean()
+        .exec(),
+
+      this.userStatModule.countDocuments({ totalPoints: { $gt: 0 } }),
+    ]);
+
+    return {
+      users,
+      pagination: {
+        page,
+        limit,
+        totalUsers: totalCount,
+        totalPages: Math.ceil(totalCount / limit),
+        hasNextPage: skip + limit < totalCount,
+        hasPrevPage: page > 1,
+      },
+    };
+  }
+  async getFilteredLeaderBoard(filters: {
+    userName?: string;
+    period?: string;
+    page?: number;
+    limit?: number;
+  }) {
+    const query: any = {};
+
+    if (filters.userName) {
+      query.userName = { $regex: filters.userName, $options: 'i' };
+    }
+    if (filters.period && filters.period !== 'all') {
+      query.lastUpdated = this.getTimeFilter(filters.period);
+    }
+    const isSearchMode = !!filters.userName;
+    if (isSearchMode) {
+      try {
+        const results = await this.userStatModule
+          .find(query)
+          .sort({ totalPoints: -1 })
+          .limit(10)
+          .lean();
+        return getSuccessResponse(
+          results,
+          `User filtered with user name ${filters.userName}`,
+        );
+      } catch (error) {
+        if (error instanceof Error)
+          throw new Error(
+            `error occurred in getFilteredLeaderBoard ${error.message}`,
+          );
+      }
+    }
+    try {
+      const page = filters.page || 1;
+      const limit = filters.limit || 50;
+      const skip = (page - 1) * limit;
+
+      const users = await this.userStatModule
+        .find(query)
+        .sort({ totalPoints: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean();
+
+      return getSuccessResponse(
+        this.paginateData(users, page, limit),
+        `User filtered with ${JSON.stringify(query)} filter and pagination`,
+      );
+    } catch (error) {
+      if (error instanceof Error)
+        throw new Error(
+          `error occurred in getFilteredLeaderBoard ${error.message}`,
+        );
+    }
+  }
 }

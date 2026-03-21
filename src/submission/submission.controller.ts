@@ -16,7 +16,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { SessionGuard } from 'src/sessiontoken/session.guard';
 import { CreateSubmissionDto } from './dto/create-submissiondto';
 import { getFailureResponse, getSuccessResponse } from 'src/utils';
-import {  Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { UpdateSubmissionDTO } from './dto/update-submissionstatusdto';
 import submitCode from 'src/services/sumbitCode';
 
@@ -26,24 +26,34 @@ export class SubmissionController {
 
   @UseGuards(AuthGuard, SessionGuard)
   @Post('users/:userId/submissions')
-  async create(@Param('userId') userId: Types.ObjectId,@Body() submissionDTO: CreateSubmissionDto) {
+  async create(
+    @Param('userId') userId: Types.ObjectId,
+    @Body() submissionDTO: CreateSubmissionDto,
+  ) {
     try {
-
-      const submission = await this.submissionService.createSubmission(submissionDTO);
+      const submission = await this.submissionService.createSubmission(
+        submissionDTO,
+      );
 
       return submission;
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return getFailureResponse(error.message);
     }
   }
 
   @UseGuards(AuthGuard, SessionGuard)
   @Post('users/:userId/submissions/batch')
-  async multiSubmit(@Param('userId') userId: Types.ObjectId,@Body() submissionsData: {submissions:CreateSubmissionDto[]}) {
+  async multiSubmit(
+    @Param('userId') userId: Types.ObjectId,
+    @Body() submissionsData: { submissions: CreateSubmissionDto[] },
+  ) {
     try {
       const submissionsResponses =
-        await this.submissionService.createSubmissions(userId,submissionsData.submissions);
+        await this.submissionService.createSubmissions(
+          userId,
+          submissionsData.submissions,
+        );
       return submissionsResponses;
     } catch (error) {
       return getFailureResponse(error.message);
@@ -52,9 +62,12 @@ export class SubmissionController {
 
   @UseGuards(AuthGuard, SessionGuard)
   @Get('/users/:userId/submissions/:id')
-  async findById(@Param('id') id: Types.ObjectId,@Param('userId') userId:Types.ObjectId) {
+  async findById(
+    @Param('id') id: Types.ObjectId,
+    @Param('userId') userId: Types.ObjectId,
+  ) {
     try {
-      return await this.submissionService.findById(id,userId);
+      return await this.submissionService.findById(id, userId);
     } catch (error) {
       throw new NotFoundException();
     }
@@ -64,7 +77,7 @@ export class SubmissionController {
   @Put('/users/:userId/submissions/:id')
   async updateStatusById(
     @Param('id') id: Types.ObjectId,
-    @Param('userId') userId:Types.ObjectId,
+    @Param('userId') userId: Types.ObjectId,
     @Body() updateStatusbody: UpdateSubmissionDTO,
   ) {
     try {
@@ -82,12 +95,13 @@ export class SubmissionController {
     }
   }
 
-  @UseGuards(AuthGuard,SessionGuard)
+  @UseGuards(AuthGuard, SessionGuard)
   @Put('batchupdate/submission')
   async batchupdate(@Body() payload: UpdateSubmissionDTO[]) {
     try {
-      const batchupdateResponse=await this.submissionService.updateSubmissionsBatch(payload)
-      return batchupdateResponse
+      const batchupdateResponse =
+        await this.submissionService.updateSubmissionsBatch(payload);
+      return batchupdateResponse;
     } catch (error) {
       if (error instanceof Error) return getFailureResponse(error.message);
       return getFailureResponse('An unknown error occurred');
@@ -143,6 +157,4 @@ export class SubmissionController {
       stats: result.stats,
     };
   }
-
-
 }

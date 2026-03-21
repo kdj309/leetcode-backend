@@ -16,7 +16,7 @@ export class LeaderboardCacheService {
     @InjectModel(LeadBoardCache.name)
     private LeadboardCacheModule: Model<LeadBoardCache>,
     @Inject('REDIS_CLIENT') private readonly redis: RedisClientType,
-  ) { }
+  ) {}
   private readonly CACHE_TTL_SECONDS = 3600; // 1 hour
   private readonly CACHE_TTL_MS = this.CACHE_TTL_SECONDS * 1000;
   async create(leaderboardData: UserStat[]) {
@@ -30,14 +30,12 @@ export class LeaderboardCacheService {
           JSON.stringify(leaderboardData),
           { EX: this.CACHE_TTL_SECONDS },
         )
-        .set(
-          this.CACHE_KEYS.LAST_UPDATE,
-          new Date().toISOString(),
-          { EX: this.CACHE_TTL_SECONDS },
-        )
+        .set(this.CACHE_KEYS.LAST_UPDATE, new Date().toISOString(), {
+          EX: this.CACHE_TTL_SECONDS,
+        })
         .exec();
       await this.LeadboardCacheModule.deleteMany({
-        generatedAt: { $lt: new Date(Date.now() - this.CACHE_TTL_MS) }
+        generatedAt: { $lt: new Date(Date.now() - this.CACHE_TTL_MS) },
       });
 
       const leaderboardCache = new this.LeadboardCacheModule({
@@ -54,11 +52,11 @@ export class LeaderboardCacheService {
         message: 'Leaderboard cache created successfully',
       };
     } catch (error) {
-      if (error instanceof Error) throw new Error(`Error in  leaderboard create method ${error.message}`);
+      if (error instanceof Error)
+        throw new Error(`Error in  leaderboard create method ${error.message}`);
     }
   }
   async invalidateCache(): Promise<void> {
-
     try {
       const pipeline = this.redis.multi();
 
@@ -69,7 +67,7 @@ export class LeaderboardCacheService {
 
       await this.LeadboardCacheModule.updateOne(
         { cacheKey: this.CACHE_KEYS.GLOBAL_LEADERBOARD },
-        { $set: { expiresAt: new Date() } }
+        { $set: { expiresAt: new Date() } },
       );
       console.log('✅ Cache invalidated successfully');
     } catch (error) {
@@ -84,7 +82,8 @@ export class LeaderboardCacheService {
       }
       return cached ? JSON.parse(cached) : null;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`Failed to get leaderboard from cache: ${errorMessage}`);
     }
   }

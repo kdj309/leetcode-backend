@@ -6,8 +6,8 @@ export class UpdateUserDto {
     type: String,
     description: 'Difficulty level of user',
   })
-@IsIn(['easy', 'medium', 'hard'])
-@IsNotEmpty()
+  @IsIn(['easy', 'medium', 'hard'])
+  @IsNotEmpty()
   difficult: string;
 
   @ApiProperty({

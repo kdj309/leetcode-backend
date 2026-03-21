@@ -1,0 +1,995 @@
+{
+  "info": {
+    "name": "LeetCode Clone API",
+    "description": "Complete API collection for LeetCode Clone Backend - NestJS + MongoDB\n\n**Base URL**: http://localhost:3000\n\n**Authentication**: JWT via cookies (access-token, refresh-token, session-token)\n\n**Features**:\n- User authentication and authorization\n- Problem management\n- Code submission and execution via Judge0\n- User rankings and leaderboard\n- Batch submission processing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "leetcode-clone-api-{{$timestamp}}"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "App",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                ""
+              ]
+            },
+            "description": "Simple health check endpoint to verify API is running."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Sign In",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.environment.set('accessToken', jsonData.data.tokens.accesstoken);",
+                  "  pm.environment.set('refreshToken', jsonData.data.tokens.refreshtoken);",
+                  "  pm.environment.set('sessionToken', jsonData.data.tokens.sessiontoken);",
+                  "  pm.environment.set('userId', jsonData.data.user._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"securePassword123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Authenticate user with email and password. Returns JWT tokens in cookies."
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"securePassword123\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [
+                {
+                  "domain": "localhost",
+                  "path": "/",
+                  "secure": false,
+                  "httpOnly": true,
+                  "name": "access-token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                },
+                {
+                  "domain": "localhost",
+                  "path": "/",
+                  "secure": false,
+                  "httpOnly": true,
+                  "name": "refresh-token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                }
+              ],
+              "body": "{\n  \"status\": \"Success\",\n  \"data\": {\n    \"user\": {\n      \"_id\": \"64b7c2f5e4b0a2a1b2c3d4e5\",\n      \"username\": \"john_doe\",\n      \"email\": \"john.doe@example.com\",\n      \"roles\": [\"user\"]\n    },\n    \"tokens\": {\n      \"accesstoken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n      \"refreshtoken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n      \"sessiontoken\": \"generated-session-token\"\n    }\n  }\n}"
+            }
+          ]
+        },
+        {
+          "name": "Sign Out",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Logout current user and clear session."
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var jsonData = pm.response.json();",
+                  "  pm.environment.set('accessToken', jsonData.data.accesstoken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Refresh access token using refresh token. Requires valid refresh token in cookies."
+          },
+          "response": []
+        },
+        {
+          "name": "Validate Session",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/session/validation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "session",
+                "validation"
+              ]
+            },
+            "description": "Validate current session token. Returns if session is expired."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                ""
+              ]
+            },
+            "description": "Retrieve all users in the system."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
+            },
+            "description": "Retrieve a specific user by MongoDB ObjectId. Requires AuthGuard and SessionGuard."
+          },
+          "response": []
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"jane_smith\",\n  \"email\": \"jane.smith@example.com\",\n  \"password\": \"securePassword456\",\n  \"favoriteProgrammingLanguage\": 71,\n  \"roles\": [\"user\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/createUser",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "createUser"
+              ]
+            },
+            "description": "Create a new user account.\n\n**DTO Fields**:\n- `username` (string, required): Min length 5\n- `email` (string, required): Valid email format\n- `password` (string, required): Min length 8\n- `favoriteProgrammingLanguage` (number, required): Language ID from Judge0\n- `roles` (array, optional): User roles"
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"jane_smith_updated\",\n  \"favoriteProgrammingLanguage\": 93\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}"
+              ]
+            },
+            "description": "Update user profile information. Requires AuthGuard and SessionGuard."
+          },
+          "response": []
+        },
+        {
+          "name": "Add Submission to User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"submissionId\": \"64b7c2f5e4b0a2a1b2c3d4e5\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/submission",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}",
+                "submission"
+              ]
+            },
+            "description": "Add a submission reference to user's submission array. Requires AuthGuard and SessionGuard."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}",
+                "{{userId}}"
+              ]
+            },
+            "description": "Delete a user account. Requires AuthGuard, RolesGuard (ADMIN), and SessionGuard."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Problems",
+      "item": [
+        {
+          "name": "Create Problem",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Two Sum\",\n  \"description\": \"Given an array of integers, return indices of the two numbers such that they add up to a specific target.\",\n  \"difficulty\": \"medium\",\n  \"sampleInput\": \"[2, 7, 11, 15], target = 9\",\n  \"sampleOutput\": \"[0, 1]\",\n  \"testCases\": [\n    {\n      \"input\": \"[2, 7, 11, 15], target = 9\",\n      \"output\": \"[0, 1]\"\n    },\n    {\n      \"input\": \"[3, 2, 4], target = 6\",\n      \"output\": \"[1, 2]\"\n    }\n  ],\n  \"starterCode\": [\n    {\n      \"language\": \"python\",\n      \"code\": \"def twoSum(nums, target):\\n    pass\"\n    },\n    {\n      \"language\": \"javascript\",\n      \"code\": \"function twoSum(nums, target) {\\n    // solution here\\n}\"\n    }\n  ],\n  \"status\": \"published\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/problems/createProblem/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "problems",
+                "createProblem",
+                "{{userId}}"
+              ]
+            },
+            "description": "Create a new problem. Requires AuthGuard, RolesGuard (ADMIN), and SessionGuard.\n\n**DTO Fields**:\n- `title` (string, required)\n- `description` (string, optional)\n- `difficulty` (enum: \"easy\", \"medium\", \"hard\", required)\n- `sampleInput` (string, required)\n- `sampleOutput` (string, required)\n- `testCases` (array, required): Objects with input/output\n- `starterCode` (array, required): Code snippets for each language\n- `status` (string, optional): \"draft\" or \"published\""
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Problems",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/problems",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "problems"
+              ]
+            },
+            "description": "Retrieve all problems. Public endpoint."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Problem by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/problems/{{problemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "problems",
+                "{{problemId}}"
+              ]
+            },
+            "description": "Retrieve a specific problem by MongoDB ObjectId. Public endpoint."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Problem",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Two Sum - Updated\",\n  \"difficulty\": \"easy\",\n  \"status\": \"published\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/problems/{{problemId}}/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "problems",
+                "{{problemId}}",
+                "{{userId}}"
+              ]
+            },
+            "description": "Update an existing problem. Requires AuthGuard, RolesGuard (ADMIN), and SessionGuard."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Problem",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/problems/{{problemId}}/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "problems",
+                "{{problemId}}",
+                "{{userId}}"
+              ]
+            },
+            "description": "Delete a problem. Requires AuthGuard, RolesGuard (ADMIN), and SessionGuard."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Submissions",
+      "item": [
+        {
+          "name": "Create Single Submission",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"problemId\": \"{{problemId}}\",\n  \"status\": \"PENDING\",\n  \"language_id\": 93,\n  \"source_code\": \"def twoSum(nums, target):\\n    for i in range(len(nums)):\\n        for j in range(i + 1, len(nums)):\\n            if nums[i] + nums[j] == target:\\n                return [i, j]\\n    return []\",\n  \"stdin\": \"[2, 7, 11, 15]\\n9\",\n  \"expected_output\": \"[0, 1]\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/submissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}",
+                "submissions"
+              ]
+            },
+            "description": "Submit a single code submission to Judge0. Requires AuthGuard and SessionGuard.\n\n**DTO Fields**:\n- `userId` (string, required): MongoDB ObjectId\n- `problemId` (string, required): MongoDB ObjectId\n- `status` (enum, required): \"PENDING\", \"ACCEPTED\", \"WRONG_ANSWER\"\n- `language_id` (number, required): Judge0 language ID\n- `source_code` (string, required): Code to execute\n- `stdin` (string, required): Input for the code\n- `expected_output` (string, optional)\n- `executionTime` (number, optional): In milliseconds\n- `memoryUsed` (number, optional): In kilobytes"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Batch Submissions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"submissions\": [\n    {\n      \"userId\": \"{{userId}}\",\n      \"problemId\": \"{{problemId}}\",\n      \"status\": \"PENDING\",\n      \"language_id\": 93,\n      \"source_code\": \"def solution1(): pass\",\n      \"stdin\": \"test1\",\n      \"expected_output\": \"result1\"\n    },\n    {\n      \"userId\": \"{{userId}}\",\n      \"problemId\": \"{{problemId}}\",\n      \"status\": \"PENDING\",\n      \"language_id\": 93,\n      \"source_code\": \"def solution2(): pass\",\n      \"stdin\": \"test2\",\n      \"expected_output\": \"result2\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/submissions/batch",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}",
+                "submissions",
+                "batch"
+              ]
+            },
+            "description": "Submit multiple code submissions at once (batch submission). Requires AuthGuard and SessionGuard.\n\n**Body**:\n- `submissions` (array, required): Array of submission objects (same structure as single submission)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Submission by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/submissions/{{submissionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}",
+                "submissions",
+                "{{submissionId}}"
+              ]
+            },
+            "description": "Retrieve a specific submission by MongoDB ObjectId. Requires AuthGuard and SessionGuard."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Submission Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACCEPTED\",\n  \"executionTime\": 45,\n  \"memoryUsed\": 512,\n  \"actual_output\": \"[0, 1]\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/submissions/{{submissionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}",
+                "submissions",
+                "{{submissionId}}"
+              ]
+            },
+            "description": "Update submission result (when Judge0 returns results). Requires AuthGuard and SessionGuard."
+          },
+          "response": []
+        },
+        {
+          "name": "Batch Update Submissions",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"_id\": \"{{submissionId}}\",\n    \"status\": \"ACCEPTED\",\n    \"actual_output\": \"result1\"\n  },\n  {\n    \"_id\": \"{{submissionId}}\",\n    \"status\": \"WRONG_ANSWER\",\n    \"actual_output\": \"wrong result\"\n  }\n]"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/batchupdate/submission",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "batchupdate",
+                "submission"
+              ]
+            },
+            "description": "Update multiple submissions at once."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Problem Submissions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/problems/{{problemId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}",
+                "problems",
+                "{{problemId}}"
+              ]
+            },
+            "description": "Retrieve all submissions for a specific problem by a user. Requires AuthGuard and SessionGuard."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Submissions - Paginated",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{userId}}/submissions?page=1&limit=20&status=ACCEPTED&problemId={{problemId}}&languageId=93&sortBy=submittedAt&sortOrder=desc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "{{userId}}",
+                "submissions"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "ACCEPTED",
+                  "disabled": true
+                },
+                {
+                  "key": "problemId",
+                  "value": "{{problemId}}",
+                  "disabled": true
+                },
+                {
+                  "key": "languageId",
+                  "value": "93",
+                  "disabled": true
+                },
+                {
+                  "key": "sortBy",
+                  "value": "submittedAt",
+                  "disabled": true
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "desc",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Get paginated submissions for user with optional filters.\n\n**Query Parameters**:\n- `page` (number, default: 1)\n- `limit` (number, default: 20)\n- `status` (string, optional): Filter by submission status\n- `problemId` (string, optional): Filter by problem\n- `languageId` (number, optional): Filter by programming language\n- `sortBy` (string, optional): Field to sort by\n- `sortOrder` (string, optional): \"asc\" or \"desc\"\n\nRequires AuthGuard and SessionGuard."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User Stats",
+      "item": [
+        {
+          "name": "Create User Stats",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user-stats/create",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user-stats",
+                "create"
+              ]
+            },
+            "description": "Initialize user stats record. Requires AuthGuard and SessionGuard.\n\n**Body**:\n- `userId` (string, required): MongoDB ObjectId"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/user-stats/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user-stats",
+                "{{userId}}"
+              ]
+            },
+            "description": "Retrieve user statistics including problems solved by difficulty. Requires AuthGuard and SessionGuard."
+          },
+          "response": []
+        },
+        {
+          "name": "Update User Stats",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"difficult\": \"medium\",\n  \"problemId\": \"{{problemId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user-stats/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user-stats",
+                "{{userId}}"
+              ]
+            },
+            "description": "Update user stats when a problem is solved.\n\n**DTO Fields**:\n- `difficult` (enum, required): \"easy\", \"medium\", \"hard\"\n- `problemId` (string, required): MongoDB ObjectId\n\nRequires AuthGuard and SessionGuard."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Online Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isOnline\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/user-stats/{{userId}}/online-status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "user-stats",
+                "{{userId}}",
+                "online-status"
+              ]
+            },
+            "description": "Update user's online status. Requires AuthGuard and SessionGuard.\n\n**Body**:\n- `isOnline` (boolean, required)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Leaderboard",
+      "item": [
+        {
+          "name": "Get Leaderboard - Paginated",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/leaderboard/paginated?page=1&limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "leaderboard",
+                "paginated"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            },
+            "description": "Get paginated leaderboard data with user rankings. Requires AuthGuard and SessionGuard.\n\n**Query Parameters**:\n- `page` (number, default: 1): Page number\n- `limit` (number, default: 50): Results per page\n\n**Response**:\n```json\n{\n  \"status\": \"Success\",\n  \"data\": {\n    \"users\": [\n      {\n        \"_id\": \"ObjectId\",\n        \"userId\": { \"_id\": \"\", \"username\": \"\", \"email\": \"\" },\n        \"rank\": 1,\n        \"totalPoints\": 1500,\n        \"easySolved\": 10,\n        \"mediumSolved\": 5,\n        \"hardSolved\": 2,\n        \"previousRank\": 2,\n        \"isOnline\": true\n      }\n    ],\n    \"pagination\": {\n      \"currentPage\": 1,\n      \"totalPages\": 10,\n      \"totalUsers\": 500,\n      \"pageSize\": 50\n    }\n  }\n}"
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Leaderboard Cache",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/leaderboard/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "leaderboard",
+                "refresh"
+              ]
+            },
+            "description": "Trigger leaderboard cache refresh. Queues async job via BullMQ. Requires AuthGuard and SessionGuard.\n\n**Response**: Returns BullMQ job ID for tracking."
+          },
+          "response": []
+        },
+        {
+          "name": "Recalculate Ranks",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/leaderboard/recalculate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "leaderboard",
+                "recalculate"
+              ]
+            },
+            "description": "Recalculate all user ranks. Queues async job via BullMQ. Requires AuthGuard and SessionGuard.\n\n**Response**: Returns BullMQ job ID for tracking progress."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Leaderboard Cache",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/leaderboard/create",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "leaderboard",
+                "create"
+              ]
+            },
+            "description": "Initialize leaderboard cache. Requires AuthGuard and SessionGuard."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Position",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/leaderboard/user/{{userId}}/position",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "leaderboard",
+                "user",
+                "{{userId}}",
+                "position"
+              ]
+            },
+            "description": "Get specific user's rank and position in leaderboard. Public endpoint.\n\n**Response**:\n```json\n{\n  \"status\": \"Success\",\n  \"data\": {\n    \"rank\": 42,\n    \"totalPoints\": 750,\n    \"easySolved\": 5,\n    \"mediumSolved\": 3,\n    \"hardSolved\": 1,\n    \"previousRank\": 45\n  }\n}\n```"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Users - Filters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/leaderboard/filters?username=john&period=week&page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "leaderboard",
+                "filters"
+              ],
+              "query": [
+                {
+                  "key": "username",
+                  "value": "john"
+                },
+                {
+                  "key": "period",
+                  "value": "week"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Search and filter leaderboard users. Public endpoint.\n\n**Query Parameters**:\n- `username` (string, optional): Search by username\n- `period` (string, optional): \"week\", \"month\", \"all-time\"\n- `page` (number, optional, default: 1)\n- `limit` (number, optional, default: 20)\n\n**Response**: Array of filtered users with pagination metadata."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "64b7c2f5e4b0a2a1b2c3d4e5",
+      "type": "string"
+    },
+    {
+      "key": "problemId",
+      "value": "64b7c2f5e4b0a2a1b2c3d4e6",
+      "type": "string"
+    },
+    {
+      "key": "submissionId",
+      "value": "64b7c2f5e4b0a2a1b2c3d4e7",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sessionToken",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

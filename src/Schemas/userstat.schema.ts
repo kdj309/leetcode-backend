@@ -4,13 +4,16 @@ import { User } from './user.schema';
 
 @Schema({ timestamps: true })
 export class UserStat {
-   @Prop({ 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'User', 
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
-    unique: true 
+    unique: true,
   })
   userId: Types.ObjectId;
+
+  @Prop({ type: String })
+  userName: string;
 
   @Prop({ type: Number, default: 0 })
   totalPoints: number;
@@ -43,3 +46,5 @@ export class UserStat {
   lastSeen: Date;
 }
 export const UserStatSchema = SchemaFactory.createForClass(UserStat);
+UserStatSchema.index({ userName: 1 });
+UserStatSchema.index({ lastUpdated: 1 });

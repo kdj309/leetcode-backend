@@ -18,7 +18,7 @@ import { Roles } from 'src/roles/roles.decorator';
 import { Role } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGaurd } from 'src/roles/roles.guard';
-import {  Types } from 'mongoose';
+import { Types } from 'mongoose';
 import { getFailureResponse, getSuccessResponse } from 'src/utils';
 import { submission } from 'src/interfaces/config.interface';
 import { Response } from 'express';

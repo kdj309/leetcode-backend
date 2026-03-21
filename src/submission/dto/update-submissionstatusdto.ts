@@ -44,5 +44,5 @@ export class UpdateSubmissionDTO {
   submittedAt?: Date;
 
   @IsOptional()
-  difficulty?:string;
+  difficulty?: string;
 }

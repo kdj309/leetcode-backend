@@ -50,5 +50,4 @@ export class createUser {
   })
   @IsEnum(supportedlanguages)
   favoriteProgrammingLanguage?: number;
-
 }

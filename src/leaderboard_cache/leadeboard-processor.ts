@@ -9,15 +9,15 @@ import { Logger } from '@nestjs/common';
   concurrency: 1,
   limiter: {
     max: 10,
-    duration: 60000
-  }
+    duration: 60000,
+  },
 })
 export class LeaderboardProcessor extends WorkerHost {
   private readonly logger = new Logger(LeaderboardProcessor.name);
 
   constructor(
     private userStatsService: UserStatsService,
-    private leaderboardCacheService: LeaderboardCacheService
+    private leaderboardCacheService: LeaderboardCacheService,
   ) {
     super();
   }
@@ -36,10 +36,12 @@ export class LeaderboardProcessor extends WorkerHost {
           throw new Error(`Unknown job type: ${job.name}`);
       }
     } catch (error) {
-      this.logger.error(`Job ${job.name} failed: ${error.message}`, error.stack);
+      this.logger.error(
+        `Job ${job.name} failed: ${error.message}`,
+        error.stack,
+      );
       throw error;
     }
-
   }
 
   private async recalculateAllRanks(job: Job) {
@@ -53,7 +55,7 @@ export class LeaderboardProcessor extends WorkerHost {
       const batch = users.slice(i, i + batchSize);
       await this.userStatsService.updateRanksBatch(batch, i);
 
-      const progress = 30 + ((i / users.length) * 60);
+      const progress = 30 + (i / users.length) * 60;
       job.updateProgress(progress);
     }
 
@@ -61,11 +63,13 @@ export class LeaderboardProcessor extends WorkerHost {
       await this.leaderboardCacheService.invalidateCache();
       this.logger.log('Cache invalidated successfully');
       job.updateProgress(85);
-
     } catch (cacheError) {
-      this.logger.warn('Cache invalidation failed, but continuing:', cacheError);
+      this.logger.warn(
+        'Cache invalidation failed, but continuing:',
+        cacheError,
+      );
     }
-     this.logger.log('Creating fresh cache...');
+    this.logger.log('Creating fresh cache...');
     try {
       const freshUsers = await this.userStatsService.getAllUsersSorted();
       await this.leaderboardCacheService.create(freshUsers);
@@ -73,12 +77,11 @@ export class LeaderboardProcessor extends WorkerHost {
     } catch (cacheError) {
       this.logger.error('❌ Failed to create cache:', cacheError);
     }
-      job.updateProgress(100);
-
+    job.updateProgress(100);
 
     return {
       message: `Updated ranks for ${users.length} users`,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -97,7 +100,7 @@ export class LeaderboardProcessor extends WorkerHost {
       return {
         message: 'Leaderboard cache updated successfully',
         usersCount: users.length,
-        timestamp: new Date()
+        timestamp: new Date(),
       };
     } catch (error) {
       throw new Error(`Failed to update leaderboard cache: ${error.message}`);

@@ -14,16 +14,16 @@ export interface ConfigProps {
   mongodb: {
     database: MongodbConfigProps;
   };
-  redis:{
-    url:string;
-    password:string;
-    port:string
-  },
-  judge:{
-    url:string,
-    key:string,
-    host:string
-  }
+  redis: {
+    url: string;
+    password: string;
+    port: string;
+  };
+  judge: {
+    url: string;
+    key: string;
+    host: string;
+  };
 }
 export interface signup {
   access_token: string;
@@ -62,19 +62,19 @@ export enum supportedlanguages {
 export interface SubmissionFilters {
   page?: number;
   limit?: number;
-  status?: "ACCEPTED"|"WRONG_ANSWER";
-  problemId?: string;            
-  languageId?: number;             
-  dateFrom?: Date;                  
-  dateTo?: Date;                    
+  status?: 'ACCEPTED' | 'WRONG_ANSWER';
+  problemId?: string;
+  languageId?: number;
+  dateFrom?: Date;
+  dateTo?: Date;
   sortBy?: 'submittedAt' | 'executionTime' | 'status';
   sortOrder?: 'asc' | 'desc';
 }
 export enum LeaderboardJobs {
   RECALCULATE_ALL_RANKS = 'recalculate-all-ranks',
-  RECALCULATE_USER_RANK = 'recalculate-user-rank', 
+  RECALCULATE_USER_RANK = 'recalculate-user-rank',
   UPDATE_LEADERBOARD_CACHE = 'update-leaderboard-cache',
-  CLEANUP_OLD_SNAPSHOTS = 'cleanup-old-snapshots'
+  CLEANUP_OLD_SNAPSHOTS = 'cleanup-old-snapshots',
 }
 export interface batchsubmission {
   token: string;

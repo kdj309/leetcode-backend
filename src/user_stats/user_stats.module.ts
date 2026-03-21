@@ -7,6 +7,7 @@ import { SubmissionModule } from 'src/submission/submission.module';
 import { Submission, SubmissionSchema } from 'src/Schemas/submission.schema';
 import { AuthModule } from 'src/auth/auth.module';
 import { SessiontokenModule } from 'src/sessiontoken/sessiontoken.module';
+import { User } from 'src/Schemas/user.schema';
 
 @Module({
   imports: [
@@ -16,12 +17,16 @@ import { SessiontokenModule } from 'src/sessiontoken/sessiontoken.module';
         schema: UserStatSchema,
       },
       {
-        name:Submission.name,
-        schema:SubmissionSchema
-      }
+        name: Submission.name,
+        schema: SubmissionSchema,
+      },
+      {
+        name: User.name,
+        schema: User,
+      },
     ]),
     AuthModule,
-    SessiontokenModule
+    SessiontokenModule,
   ],
   controllers: [UserStatsController],
   providers: [UserStatsService],

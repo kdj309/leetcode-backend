@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsIn, IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsIn,
+  IsMongoId,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { Types } from 'mongoose';
 
 export class CreateSubmissionDto {
@@ -23,11 +30,12 @@ export class CreateSubmissionDto {
 
   @ApiProperty({
     type: String,
-    description: 'The status of the submission (e.g., Accepted, Wrong Answer, Runtime Error).',
+    description:
+      'The status of the submission (e.g., Accepted, Wrong Answer, Runtime Error).',
     example: 'Accepted',
   })
   @IsNotEmpty()
-  @IsIn(["PENDING","ACCEPTED","WRONG_ANSWER"])
+  @IsIn(['PENDING', 'ACCEPTED', 'WRONG_ANSWER'])
   status: string;
 
   @ApiProperty({
@@ -78,14 +86,14 @@ export class CreateSubmissionDto {
   submittedAt?: Date;
 
   @IsNotEmpty()
-  stdin?:string
+  stdin?: string;
 
   @IsOptional()
-  expected_output?:string
+  expected_output?: string;
 
   @IsOptional()
-  actual_output?:string
+  actual_output?: string;
 
   @IsOptional()
-  submissionId?:string
+  submissionId?: string;
 }

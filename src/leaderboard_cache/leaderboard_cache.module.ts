@@ -13,7 +13,6 @@ import { SessiontokenModule } from 'src/sessiontoken/sessiontoken.module';
 import { UsersModule } from 'src/users/users.module';
 import { SubmissionModule } from 'src/submission/submission.module';
 
-
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -23,10 +22,10 @@ import { SubmissionModule } from 'src/submission/submission.module';
     AuthModule,
     SessiontokenModule,
     UsersModule,
-    SubmissionModule
+    SubmissionModule,
   ],
   controllers: [LeaderboardCacheController],
-  providers: [LeaderboardCacheService,LeaderboardProcessor],
+  providers: [LeaderboardCacheService, LeaderboardProcessor],
   exports: [LeaderboardCacheService],
 })
 export class LeaderboardCacheModule implements NestModule {

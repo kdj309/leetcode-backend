@@ -20,8 +20,12 @@ export class User {
   @Prop({ type: Number, enum: supportedlanguages })
   favoriteProgrammingLanguage: number;
 
-  @Prop({ type: [mongoose.Schema.Types.ObjectId], default: [], ref: 'Submission' })
-  submissions: mongoose.Types.ObjectId [];
+  @Prop({
+    type: [mongoose.Schema.Types.ObjectId],
+    default: [],
+    ref: 'Submission',
+  })
+  submissions: mongoose.Types.ObjectId[];
 
   @Prop()
   hashedpassword: string;

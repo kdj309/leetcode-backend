@@ -47,12 +47,14 @@ export class UsersService {
     try {
       const user = await this.userModel.findOne({ email: userData.email });
       if (!user) {
-        const newuser = new this.userModel({...userData,submissions:[]});
+        const newuser = new this.userModel({ ...userData, submissions: [] });
         const payload = { sub: newuser.id, username: newuser.username };
         await newuser.save();
         const sessiontoken = await this.sessionService.createToken(newuser._id);
-        //@ts-ignore
-        const refreshtoken = await this.retryTokenService.createToken(newuser._id);
+        const refreshtoken = await this.retryTokenService.createToken(
+          //@ts-ignore
+          newuser._id,
+        );
         return getSuccessResponse(
           {
             access_token: await this.jwtService.signAsync(payload),
@@ -63,7 +65,7 @@ export class UsersService {
           'User Created Successfully',
         );
       } else {
-        return getSuccessResponse(null,'User Already Exists');
+        return getSuccessResponse(null, 'User Already Exists');
       }
     } catch (error) {
       if (error instanceof Error) {
@@ -113,7 +115,9 @@ export class UsersService {
       }
     } catch (error) {
       if (error instanceof Error) {
-        throw new Error(`error in addSubmission of UserService ${error.message}`);
+        throw new Error(
+          `error in addSubmission of UserService ${error.message}`,
+        );
       }
     }
   }

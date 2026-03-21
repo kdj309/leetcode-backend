@@ -1,4 +1,4 @@
-import { judgeApi } from "src/api";
+import { judgeApi } from 'src/api';
 
 interface submitCodeArgs {
   source_code: string;
@@ -17,7 +17,7 @@ async function submitCode(params: submitCodeArgs) {
     return response;
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(`error in submitcode of judge api ${error}` );
+      throw new Error(`error in submitcode of judge api ${error}`);
     }
   }
 }

@@ -10,11 +10,13 @@ import { UserStatsModule } from 'src/user_stats/user_stats.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Submission.name, schema: SubmissionSchema }]),
-    MongooseModule.forFeature([{name:User.name,schema:User}]),
+    MongooseModule.forFeature([
+      { name: Submission.name, schema: SubmissionSchema },
+    ]),
+    MongooseModule.forFeature([{ name: User.name, schema: User }]),
     AuthModule,
     SessiontokenModule,
-    UserStatsModule
+    UserStatsModule,
   ],
   controllers: [SubmissionController],
   providers: [SubmissionService],

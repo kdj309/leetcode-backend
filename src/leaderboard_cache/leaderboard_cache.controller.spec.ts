@@ -9,7 +9,9 @@ describe('LeaderboardCacheController', () => {
       controllers: [LeaderboardCacheController],
     }).compile();
 
-    controller = module.get<LeaderboardCacheController>(LeaderboardCacheController);
+    controller = module.get<LeaderboardCacheController>(
+      LeaderboardCacheController,
+    );
   });
 
   it('should be defined', () => {

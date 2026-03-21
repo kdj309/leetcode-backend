@@ -18,7 +18,7 @@ export class SubmissionService {
   constructor(
     @InjectModel(Submission.name) private submissionModule: Model<Submission>,
     @InjectModel(User.name) private userModule: Model<User>,
-     private userStatsService: UserStatsService,
+    private userStatsService: UserStatsService,
   ) {}
 
   async createSubmission(createSubmissionDTO: CreateSubmissionDto) {
@@ -29,14 +29,20 @@ export class SubmissionService {
         stdin: createSubmissionDTO.stdin,
         language_id: createSubmissionDTO.language_id,
       });
-      return getSuccessResponse(response.data?.token, 'Problem submitted Succesfully');
+      return getSuccessResponse(
+        response.data?.token,
+        'Problem submitted Succesfully',
+      );
     } catch (error) {
       if (error instanceof Error)
         throw new Error(`[createSubmission] ${error.message}`);
     }
   }
 
-  async createSubmissions( userId: Types.ObjectId,submissions: CreateSubmissionDto[]) {
+  async createSubmissions(
+    userId: Types.ObjectId,
+    submissions: CreateSubmissionDto[],
+  ) {
     try {
       const judgeSubmissions = submissions.map((s) => ({
         language_id: s.language_id,
@@ -46,28 +52,33 @@ export class SubmissionService {
       }));
       const judgeResponses = await batchwiseSubmission(judgeSubmissions);
       const dbResults = new this.submissionModule({
-        code:submissions[0].source_code,
-        input:submissions.map((s)=>s.stdin),
-        languageId:submissions[0].language_id,
-        problemId:submissions[0].problemId,
-        expected_output:submissions.map((s)=>s.expected_output),
-        status:'PENDING',
+        code: submissions[0].source_code,
+        input: submissions.map((s) => s.stdin),
+        languageId: submissions[0].language_id,
+        problemId: submissions[0].problemId,
+        expected_output: submissions.map((s) => s.expected_output),
+        status: 'PENDING',
         userId,
-        submissionId:judgeResponses.map((r)=>r.token),
-        submittedAt:new Date(),
-        actual_output:submissions.map((s)=>''),
-        executionTime:0,
-        memoryUsed:0
+        submissionId: judgeResponses.map((r) => r.token),
+        submittedAt: new Date(),
+        actual_output: submissions.map((s) => ''),
+        executionTime: 0,
+        memoryUsed: 0,
       });
-      await dbResults.save()
-      const dbResultObj=dbResults.toObject();
+      await dbResults.save();
+      const dbResultObj = dbResults.toObject();
       await this.userModule.updateOne(
         { _id: userId },
         { $addToSet: { submissions: dbResults._id } },
       );
       await this.userStatsService.create(userId);
       return getSuccessResponse(
-        {...dbResultObj,submissionIds:judgeResponses.map((judgeResponse)=>judgeResponse.token)},
+        {
+          ...dbResultObj,
+          submissionIds: judgeResponses.map(
+            (judgeResponse) => judgeResponse.token,
+          ),
+        },
         'Successfully submitted batch submission',
       );
     } catch (error) {
@@ -75,9 +86,12 @@ export class SubmissionService {
         throw new Error(`[createSubmissions] ${error.message}`);
     }
   }
-  async findById(submissionId: Types.ObjectId,userId:Types.ObjectId) {
+  async findById(submissionId: Types.ObjectId, userId: Types.ObjectId) {
     try {
-      const submission = await this.submissionModule.find({userId,_id:submissionId});
+      const submission = await this.submissionModule.find({
+        userId,
+        _id: submissionId,
+      });
       if (!submission) {
         return null;
       }
@@ -93,12 +107,16 @@ export class SubmissionService {
 
   async updateSubmission(
     submissionId: Types.ObjectId,
-    userId:Types.ObjectId,
+    userId: Types.ObjectId,
     updateBody: UpdateSubmissionDTO,
   ) {
     try {
       if (updateBody.status.toUpperCase() === 'ACCEPTED') {
-       await this.userStatsService.updateStats(userId,updateBody.difficulty,updateBody.problemId)
+        await this.userStatsService.updateStats(
+          userId,
+          updateBody.difficulty,
+          updateBody.problemId,
+        );
       }
       const updatedSubmission = await this.submissionModule.findByIdAndUpdate(
         submissionId,

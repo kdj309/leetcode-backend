@@ -1,12 +1,12 @@
-import {Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema({ timestamps: true })
 export class LeadBoardCache {
- @Prop({ required: true })
-  cacheKey: string; 
-  
   @Prop({ required: true })
-  userCount: number; 
+  cacheKey: string;
+
+  @Prop({ required: true })
+  userCount: number;
 
   @Prop({ default: Date.now })
   generatedAt: Date;
@@ -17,4 +17,5 @@ export class LeadBoardCache {
   @Prop()
   dataHash: string;
 }
-export const LeadBoardCacheSchema = SchemaFactory.createForClass(LeadBoardCache);
+export const LeadBoardCacheSchema =
+  SchemaFactory.createForClass(LeadBoardCache);
