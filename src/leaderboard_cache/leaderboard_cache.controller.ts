@@ -187,13 +187,30 @@ export class LeaderboardCacheController {
     @Query('limit', new DefaultValuePipe(50), ParseIntPipe) limit: number,
   ) {
     try {
-      const usersStats = await this.userStatService.getFilteredLeaderBoard({
+      if (page < 1) page = 1;
+      if (limit < 1 || limit > 100) limit = 50;
+
+      const response = await this.userStatService.getFilteredLeaderBoard({
         userName,
         period,
         page,
         limit,
       });
-      return usersStats;
+
+      // Extract the users array - handle both array and object responses
+      let usersArray: any[] = [];
+      if (Array.isArray(response?.data)) {
+        usersArray = response.data;
+      } else if (response?.data?.users && Array.isArray(response.data.users)) {
+        usersArray = response.data.users;
+      }
+
+      const paginatedResult = this.paginateData(usersArray, page, limit);
+
+      return getSuccessResponse(
+        paginatedResult,
+        `User filtered with ${userName ? `user name ${userName}` : 'filters'} and ${period || 'all'} period`,
+      );
     } catch (error) {
       return getFailureResponse(error);
     }

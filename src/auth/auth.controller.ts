@@ -63,6 +63,10 @@ export class AuthController {
       response.cookie('session-token', authresponse.data.sessiontoken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
+        domain:
+          process.env.NODE_ENV === 'production'
+            ? process.env.DOMAIN
+            : 'localhost',
         path: '/',
         maxAge: 1 * 24 * 60 * 60 * 1000,
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
@@ -146,6 +150,10 @@ export class AuthController {
       response.cookie('refresh-token', newtokenresponse.data.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
+        domain:
+          process.env.NODE_ENV === 'production'
+            ? process.env.DOMAIN
+            : 'localhost',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: '/',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
@@ -153,8 +161,23 @@ export class AuthController {
       response.cookie('access-token', newtokenresponse.data.accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
+        domain:
+          process.env.NODE_ENV === 'production'
+            ? process.env.DOMAIN
+            : 'localhost',
         maxAge: 15 * 60 * 1000, // 15 mintues
         path: '/',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      });
+      response.cookie('session-token', request.cookies['session-token'], {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        domain:
+          process.env.NODE_ENV === 'production'
+            ? process.env.DOMAIN
+            : 'localhost',
+        path: '/',
+        maxAge: 1 * 24 * 60 * 60 * 1000, // Re-extend to 1 day
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       });
       delete newtokenresponse.data.refreshToken;
