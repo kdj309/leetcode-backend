@@ -71,7 +71,8 @@ export class LeaderboardCacheService {
       );
       console.log('✅ Cache invalidated successfully');
     } catch (error) {
-      throw new Error(`Failed to invalidate cache: ${error.message}`);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to invalidate cache: ${errorMessage}`);
     }
   }
   async getLeaderboard(): Promise<UserStat[] | null> {

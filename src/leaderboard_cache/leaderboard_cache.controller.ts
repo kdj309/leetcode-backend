@@ -68,7 +68,7 @@ export class LeaderboardCacheController {
 
       return getSuccessResponse(result, 'Cached leaderboard data');
     } catch (error) {
-      return getFailureResponse(error);
+      if (error instanceof Error) return getFailureResponse(error.message);
     }
   }
 
@@ -93,7 +93,7 @@ export class LeaderboardCacheController {
         'Cache refresh job queued successfully',
       );
     } catch (error) {
-      return getFailureResponse(error);
+      if (error instanceof Error) return getFailureResponse(error.message);
     }
   }
 
@@ -118,7 +118,7 @@ export class LeaderboardCacheController {
         'Rank recalculation job queued successfully',
       );
     } catch (error) {
-      return getFailureResponse(error);
+      if (error instanceof Error) return getFailureResponse(error.message);
     }
   }
 
@@ -135,7 +135,7 @@ export class LeaderboardCacheController {
         'Leaderboard cache created successfully',
       );
     } catch (error) {
-      return getFailureResponse(error);
+      if (error instanceof Error) return getFailureResponse(error.message);
     }
   }
   @UseGuards(AuthGuard, SessionGuard)
@@ -174,7 +174,7 @@ export class LeaderboardCacheController {
         'User position retrieved',
       );
     } catch (error) {
-      return getFailureResponse(error);
+      if (error instanceof Error) return getFailureResponse(error.message)
     }
   }
 
@@ -212,7 +212,7 @@ export class LeaderboardCacheController {
         `User filtered with ${userName ? `user name ${userName}` : 'filters'} and ${period || 'all'} period`,
       );
     } catch (error) {
-      return getFailureResponse(error);
+      if (error instanceof Error) return getFailureResponse(error.message);
     }
   }
 }

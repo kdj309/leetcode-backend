@@ -25,4 +25,8 @@ export const config = (): ConfigProps => ({
     key: process.env.JUDGEAPI_API_KEY,
     host: process.env.JUDGEAPI_HOST,
   },
+  elasticsearch: {
+    node: process.env.ELASTICSEARCH_NODE,
+    apiKey: process.env.ELASTICSEARCH_API_KEY,
+  },
 });

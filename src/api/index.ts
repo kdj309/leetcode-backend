@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { config } from 'src/config/config';
+import { elasticSearchClient } from './elasticsearch.singleton';
 
 export const judgeApi = axios.create({
   baseURL: config().judge.url,
@@ -9,3 +10,5 @@ export const judgeApi = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+export { elasticSearchClient };

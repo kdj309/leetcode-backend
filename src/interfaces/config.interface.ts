@@ -24,6 +24,10 @@ export interface ConfigProps {
     key: string;
     host: string;
   };
+  elasticsearch: {
+    node: string;
+    apiKey: string;
+  };
 }
 export interface signup {
   access_token: string;

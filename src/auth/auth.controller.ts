@@ -76,9 +76,10 @@ export class AuthController {
       delete authresponse.data.sessiontoken;
       return authresponse;
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Sign in failed';
       return {
         status: 'Failure',
-        error: error.message,
+        error: errorMessage,
       };
     }
   }
@@ -187,8 +188,10 @@ export class AuthController {
       if (error instanceof HttpException) {
         throw error;
       }
+
+      const errorMessage = error instanceof Error ? error.message : 'Token refresh failed';
       throw new HttpException(
-        error?.message || 'Token refresh failed',
+        errorMessage,
         HttpStatus.BAD_REQUEST,
       );
     }
