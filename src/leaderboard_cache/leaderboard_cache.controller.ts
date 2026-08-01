@@ -6,6 +6,7 @@ import {
   ParseIntPipe,
   Post,
   Query,
+  Sse,
   UseGuards,
 } from '@nestjs/common';
 import { LeaderboardCacheService } from './leaderboard_cache.service';
@@ -16,12 +17,15 @@ import { SessionGuard } from 'src/sessiontoken/session.guard';
 import { getFailureResponse, getSuccessResponse } from 'src/utils';
 import { LeaderboardJobs } from 'src/interfaces/config.interface';
 import { UserStatsService } from 'src/user_stats/user_stats.service';
+import { Observable } from 'rxjs';
+import { LeaderboardEventsService } from './leaderboard_events.service';
 
 @Controller('leaderboard')
 export class LeaderboardCacheController {
   constructor(
     private readonly leaderBoardService: LeaderboardCacheService,
     private readonly userStatService: UserStatsService,
+    private readonly leaderboardEventsService: LeaderboardEventsService,
     @InjectQueue('leaderboard') private leaderBoardQueue: Queue,
   ) {}
   private paginateData(data: any[], page: number, limit: number) {
@@ -214,5 +218,20 @@ export class LeaderboardCacheController {
     } catch (error) {
       if (error instanceof Error) return getFailureResponse(error.message);
     }
+  }
+
+  @Sse('events')
+  sse(): Observable<MessageEvent> {
+    return new Observable<MessageEvent>((subscriber) => {
+      const subscription = this.leaderboardEventsService.subscribe().subscribe({
+        next: (event) => {
+          subscriber.next({ data: JSON.stringify(event) } as MessageEvent);
+        },
+        error: (err) => subscriber.error(err),
+        complete: () => subscriber.complete(),
+      });
+
+      return () => subscription.unsubscribe();
+    });
   }
 }

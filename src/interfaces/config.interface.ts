@@ -26,7 +26,8 @@ export interface ConfigProps {
   };
   elasticsearch: {
     node: string;
-    apiKey: string;
+    username: string;
+    password:string
   };
 }
 export interface signup {

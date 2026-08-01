@@ -126,7 +126,7 @@ export class UserStatsService {
         },
       );
       console.log('Update Stats Response:', response);
-      return response;
+      return response;  
     } catch (error) {
       if (error instanceof Error)
         throw new Error(

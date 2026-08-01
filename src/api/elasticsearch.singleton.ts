@@ -17,14 +17,14 @@ class ElasticsearchClientSingleton {
    */
   public static getInstance(): Client {
     if (!ElasticsearchClientSingleton.instance) {
-      console.log('[ElasticsearchClient] Initializing singleton instance...');
+      console.log('[ElasticsearchClient] Initializing singleton instance...',config().elasticsearch.node);
       
       ElasticsearchClientSingleton.instance = new Client({
         node: config().elasticsearch.node,
         auth: {
-          apiKey: config().elasticsearch.apiKey,
+              username: config().elasticsearch.username,
+              password: config().elasticsearch.password,
         },
-        serverMode: 'serverless',
       });
 
       console.log('[ElasticsearchClient] Singleton instance created successfully');
@@ -42,7 +42,7 @@ class ElasticsearchClientSingleton {
     return {
       isInitialized: ElasticsearchClientSingleton.instance !== null,
       node: config().elasticsearch.node,
-      hasApiKey: !!config().elasticsearch.apiKey,
+      hasApiKey: !!config().elasticsearch.password,
     };
   }
 
@@ -55,3 +55,56 @@ class ElasticsearchClientSingleton {
 }
 
 export const elasticSearchClient = ElasticsearchClientSingleton.getInstance();
+export const createIndex = async () => {
+  const indexName = 'problems_v3';
+
+  const exists = await elasticSearchClient.indices.exists({ index: indexName });
+
+  if (!exists) {
+    await elasticSearchClient.indices.create({
+      index: indexName,
+      mappings: {
+        properties: {
+          title: {
+            type: 'text',
+            fields: {
+              keyword: { type: 'keyword' },
+            },
+          },
+          description: {
+            type: 'text',
+          },
+          difficulty: {
+            type: 'keyword',
+          },
+        },
+      },
+    });
+
+    console.log('✅ Index created');
+  } else {
+    console.log('⚠️ Index already exists');
+  }
+};
+export const bulkIndexProblems = async (problems: any[]) => {
+  const operations = problems.flatMap((problem) => [
+    {
+      index: {
+        _index: 'problems_v3',
+        _id: problem._id.toString(), // 🔥 IMPORTANT
+      },
+    },
+    {
+      title: problem.title,
+      description: problem.description,
+      difficulty: problem.difficulty,
+    },
+  ]);
+
+  await elasticSearchClient.bulk({
+    refresh: true,
+    operations,
+  });
+
+  console.log('🚀 Data indexed');
+};

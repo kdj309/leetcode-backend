@@ -27,6 +27,7 @@ export const config = (): ConfigProps => ({
   },
   elasticsearch: {
     node: process.env.ELASTICSEARCH_NODE,
-    apiKey: process.env.ELASTICSEARCH_API_KEY,
+    username: process.env.ELASTICSEARCH_USERNAME,
+    password:process.env.ELASTICSEARCH_PASSWORD
   },
 });

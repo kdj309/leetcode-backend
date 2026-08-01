@@ -4,6 +4,7 @@ import { UserStatsService } from 'src/user_stats/user_stats.service';
 import { LeaderboardCacheService } from './leaderboard_cache.service';
 import { LeaderboardJobs } from 'src/interfaces/config.interface';
 import { Logger } from '@nestjs/common';
+import { LeaderboardEventsService } from './leaderboard_events.service';
 
 @Processor('leaderboard', {
   concurrency: 1,
@@ -18,6 +19,7 @@ export class LeaderboardProcessor extends WorkerHost {
   constructor(
     private userStatsService: UserStatsService,
     private leaderboardCacheService: LeaderboardCacheService,
+    private leaderboardEventsService: LeaderboardEventsService,
   ) {
     super();
   }
@@ -36,20 +38,22 @@ export class LeaderboardProcessor extends WorkerHost {
           throw new Error(`Unknown job type: ${job.name}`);
       }
     } catch (error) {
-      this.logger.error(
+      if (error instanceof Error) {
+              this.logger.error(
         `Job ${job.name} failed: ${error.message}`,
         error.stack,
       );
+      }
+
       throw error;
     }
   }
 
   private async recalculateAllRanks(job: Job) {
     job.updateProgress(10);
-
     const users = await this.userStatsService.getAllUsersSorted(false);
     job.updateProgress(30);
-
+    let cachedUserStats;
     const batchSize = 100;
     for (let i = 0; i < users.length; i += batchSize) {
       const batch = users.slice(i, i + batchSize);
@@ -72,17 +76,28 @@ export class LeaderboardProcessor extends WorkerHost {
     this.logger.log('Creating fresh cache...');
     try {
       const freshUsers = await this.userStatsService.getAllUsersSorted();
-      await this.leaderboardCacheService.create(freshUsers);
+      cachedUserStats=await this.leaderboardCacheService.create(freshUsers);
       this.logger.log('✅ Fresh cache created successfully');
     } catch (cacheError) {
       this.logger.error('❌ Failed to create cache:', cacheError);
     }
     job.updateProgress(100);
 
-    return {
-      message: `Updated ranks for ${users.length} users`,
-      timestamp: new Date(),
+    const payload = {
+      type: 'leaderboard:updated',
+      data: {
+        message: `Updated ranks for ${users.length} users`,
+        timestamp: new Date(),
+        usersCount: users.length,
+        data:users,
+        triggeredBy: job.data?.triggeredBy,
+        reason: job.data?.reason,
+      },
     };
+
+    this.leaderboardEventsService.broadcastLeaderboardUpdate(payload);
+
+    return payload.data;
   }
 
   private async updateLeaderboardCache(job: Job): Promise<any> {
@@ -97,13 +112,23 @@ export class LeaderboardProcessor extends WorkerHost {
 
       job.updateProgress(100);
 
-      return {
-        message: 'Leaderboard cache updated successfully',
-        usersCount: users.length,
-        timestamp: new Date(),
+      const payload = {
+        type: 'leaderboard:updated',
+        data: {
+          message: 'Leaderboard cache updated successfully',
+          usersCount: users,
+          timestamp: new Date(),
+        },
       };
+
+      this.leaderboardEventsService.broadcastLeaderboardUpdate(payload);
+
+      return payload.data;
     } catch (error) {
+      if (error instanceof Error) {
       throw new Error(`Failed to update leaderboard cache: ${error.message}`);
+        
+      }
     }
   }
 

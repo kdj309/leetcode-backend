@@ -21,15 +21,26 @@ interface ESMatchPhraseQuery {
   };
 }
 
+interface ESMatchQuery {
+  match?: {
+    title?: {
+      query: string;
+      boost?: number;
+      operator?: 'and' | 'or';
+    };
+  };
+}
+
 interface ESMultiMatchQuery {
   multi_match?: {
     query: string;
     fields: string[];
     fuzziness: string;
+    boost?: number;
   };
 }
 
-type ESShouldClause = ESMatchPhraseQuery | ESMultiMatchQuery;
+type ESShouldClause = ESMatchPhraseQuery | ESMatchQuery | ESMultiMatchQuery;
 
 interface ESBoolQuery {
   should?: ESShouldClause[];
@@ -73,6 +84,7 @@ export class ProblemsService {
         )
         .skip(skip)
         .limit(limitNum);
+
 
       return getSuccessResponse(
         {
@@ -134,7 +146,7 @@ export class ProblemsService {
         throw new Error(`error in problem remove method ${error.message}`);
     }
   }
-  async searchProblems(page:number,limit:number,query?: string, difficulty?: string,) {
+  async searchProblems(page: number, limit: number, query?: string, difficulty?: string,) {
     try {
       if (!query && !difficulty) {
         const problems = await this.problemModule
@@ -160,17 +172,21 @@ export class ProblemsService {
           match_phrase: {
             title: {
               query,
-              boost: 10
+              boost: 20
             }
           }
         });
+
         shouldClauses.push({
-          multi_match: {
-            query,
-            fields: ['title^3', 'description'],
-            fuzziness: 'AUTO'
+          match: {
+            title: {
+              query,
+              boost: 10,
+              operator: 'and'
+            }
           }
         });
+
       }
 
       // Build the bool query
@@ -183,17 +199,18 @@ export class ProblemsService {
         boolQuery.filter = filters;
       }
 
+
       const response = await elasticSearchClient.search({
         index: 'problems_v3',
-        from: page * limit,
+        from: (page - 1) * limit,
         size: limit,
         query: Object.keys(boolQuery).length > 0 ? { bool: boolQuery } : { match_all: {} }
-        
+
       });
 
       const hits = response.hits.hits;
       const totalResults = typeof response.hits.total === 'number' ? response.hits.total : response.hits.total.value;
-      return getSuccessResponse({results:hits,total:totalResults}, 'Search completed successfully');
+      return getSuccessResponse({ results: hits, total: totalResults }, 'Search completed successfully');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`[searchProblems] ${errorMessage}`);

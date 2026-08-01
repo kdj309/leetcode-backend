@@ -395,15 +395,63 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/problems",
+              "raw": "{{baseUrl}}/problems?page=1&limit=10",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "problems"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
               ]
             },
-            "description": "Retrieve all problems. Public endpoint."
+            "description": "Retrieve paginated problems. Public endpoint."
+          },
+          "response": []
+        },
+        {
+          "name": "Search Problems with Filters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/problems/search/filters?query=two&page=1&limit=10&difficulty=easy",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "problems",
+                "search",
+                "filters"
+              ],
+              "query": [
+                {
+                  "key": "query",
+                  "value": "two"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "difficulty",
+                  "value": "easy"
+                }
+              ]
+            },
+            "description": "Search problems by query and difficulty using the backend filtering service."
           },
           "response": []
         },
@@ -921,7 +969,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/leaderboard/filters?username=john&period=week&page=1&limit=20",
+              "raw": "{{baseUrl}}/leaderboard/filters?userName=john&period=week&page=1&limit=20",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -931,7 +979,7 @@
               ],
               "query": [
                 {
-                  "key": "username",
+                  "key": "userName",
                   "value": "john"
                 },
                 {
@@ -948,7 +996,26 @@
                 }
               ]
             },
-            "description": "Search and filter leaderboard users. Public endpoint.\n\n**Query Parameters**:\n- `username` (string, optional): Search by username\n- `period` (string, optional): \"week\", \"month\", \"all-time\"\n- `page` (number, optional, default: 1)\n- `limit` (number, optional, default: 20)\n\n**Response**: Array of filtered users with pagination metadata."
+            "description": "Search and filter leaderboard users. Public endpoint.\n\n**Query Parameters**:\n- `userName` (string, optional): Search by username\n- `period` (string, optional): \"week\", \"month\", \"all-time\"\n- `page` (number, optional, default: 1)\n- `limit` (number, optional, default: 20)\n\n**Response**: Array of filtered users with pagination metadata."
+          },
+          "response": []
+        },
+        {
+          "name": "Leaderboard SSE Events",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/leaderboard/events",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "leaderboard",
+                "events"
+              ]
+            },
+            "description": "Open an SSE stream for leaderboard updates. The server emits leaderboard:updated events whenever ranks or cache data change."
           },
           "response": []
         }

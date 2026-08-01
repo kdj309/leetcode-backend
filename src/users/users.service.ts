@@ -27,7 +27,7 @@ export class UsersService {
     const user = await this.userModel.findById(
       id,
       '-_password -hashedpassword',
-    );
+    ).populate('submissions');
     if (user) {
       return getSuccessResponse(user, 'Successfully fetched the problem');
     } else {

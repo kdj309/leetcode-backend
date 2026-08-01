@@ -18,7 +18,7 @@ import { CreateSubmissionDto } from './dto/create-submissiondto';
 import { getFailureResponse, getSuccessResponse } from 'src/utils';
 import { Types } from 'mongoose';
 import { UpdateSubmissionDTO } from './dto/update-submissionstatusdto';
-import submitCode from 'src/services/sumbitCode';
+
 
 @Controller()
 export class SubmissionController {

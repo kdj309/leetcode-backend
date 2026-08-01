@@ -218,8 +218,22 @@ Response: SuccessResponse
 
 #### Get All Problems
 ```
-GET /problems
-Response: Problem[]
+GET /problems?page=1&limit=10
+Query:
+  page: number (default: 1)
+  limit: number (default: 10)
+Response: SuccessResponse<{ problems: Problem[]; total: number; page: number; limit: number; totalPages: number }>
+```
+
+#### Search Problems with Filters
+```
+GET /problems/search/filters
+Query:
+  query?: string
+  difficulty?: string
+  page: number (default: 1)
+  limit: number (default: 10)
+Response: SuccessResponse<{ results: Problem[]; total: number }>
 ```
 
 #### Get Problem by ID
@@ -474,12 +488,12 @@ Response: SuccessResponse
 GET /leaderboard/user/:userId/position
 Params: userId (ObjectId)
 Response: SuccessResponse {
-  rank: number;
+  ranked: boolean;
+  currentRank?: number;
   totalPoints: number;
-  easySolved: number;
-  mediumSolved: number;
-  hardSolved: number;
-  previousRank?: number;
+  totalSolved: number;
+  totalRankedUsers: number;
+  percentile: string;
 }
 ```
 
@@ -487,11 +501,17 @@ Response: SuccessResponse {
 ```
 GET /leaderboard/filters
 Query:
-  username?: string       // Search filter
-  period?: 'week' | 'month' | 'all-time'
+  userName?: string       // Search filter
+  period?: string
   page?: number (default: 1)
-  limit?: number (default: 20)
-Response: SuccessResponse<LeaderboardUser[]>
+  limit?: number (default: 50)
+Response: SuccessResponse<{ users: LeaderboardUser[]; pagination: {...} }>
+```
+
+#### Leaderboard SSE Events
+```
+GET /leaderboard/events
+Response: Server-Sent Events stream emitting leaderboard:update payloads
 ```
 
 ---
