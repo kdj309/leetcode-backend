@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, PipelineStage, Types } from 'mongoose';
+import { Model, ObjectId, PipelineStage, Types } from 'mongoose';
 import { Submission } from 'src/Schemas/submission.schema';
 import { CreateSubmissionDto } from './dto/create-submissiondto';
 import { getSuccessResponse } from 'src/utils';
@@ -119,7 +119,7 @@ export class SubmissionService {
         );
       }
       const updatedSubmission = await this.submissionModule.findByIdAndUpdate(
-        submissionId,
+        {_id:submissionId,userId},
         {
           $set: {
             status: updateBody.status.toUpperCase(),
@@ -138,11 +138,11 @@ export class SubmissionService {
     }
   }
 
-  async updateSubmissionsBatch(batchUpdateBody: IBatchSubmissionDTO[]) {
+  async updateSubmissionsBatch(batchUpdateBody: IBatchSubmissionDTO[],userId:ObjectId) {
     try {
       const bulkOperations = batchUpdateBody.map((update) => ({
         updateOne: {
-          filter: { _id: update.submissionId },
+          filter: { _id: update.submissionId, userId },
           update: {
             $set: {
               ...(update.status && { status: update.status }),
@@ -223,7 +223,9 @@ export class SubmissionService {
         if (dateTo) matchConditions.submittedAt.$lte = dateTo;
       }
 
-      const skip = (page - 1) * limit;
+      const safePage = Math.max(1, page);
+      const safeLimit = Math.max(1, limit);
+      const skip = (safePage - 1) * safeLimit;
       const sortDirection = sortOrder === 'asc' ? 1 : -1;
 
       const pipeline: PipelineStage[] = [

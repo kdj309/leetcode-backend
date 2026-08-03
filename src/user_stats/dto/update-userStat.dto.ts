@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsIn, IsMongoId, IsNotEmpty } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class UpdateUserDto {
   @ApiProperty({

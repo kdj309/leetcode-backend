@@ -236,7 +236,7 @@ export class UserStatsService {
     const [users, totalCount] = await Promise.all([
       this.userStatModule
         .find({ totalPoints: { $gt: 0 } })
-        .sort({ totalPoints: -1, lastUpdated: 1 })
+        .sort({ totalPoints: -1, lastUpdated: -1 })
         .skip(skip)
         .limit(limit)
         .populate('userId', 'username email')
@@ -296,15 +296,28 @@ export class UserStatsService {
       const limit = filters.limit || 50;
       const skip = (page - 1) * limit;
 
-      const users = await this.userStatModule
-        .find(query)
-        .sort({ totalPoints: -1 })
+ const [users, totalUsers] = await Promise.all([
+      this.userStatModule
+         .find(query)
+         .sort({ totalPoints: -1 })
         .skip(skip)
         .limit(limit)
-        .lean();
+       .lean(),
+    this.userStatModule.countDocuments(query),
+   ]);
 
       return getSuccessResponse(
-        this.paginateData(users, page, limit),
+        {
+        users,
+      pagination: {
+      page,
+      limit,
+            totalUsers,
+    totalPages: Math.ceil(totalUsers / limit),
+           hasNextPage: skip + users.length < totalUsers,
+           hasPrevPage: page > 1,
+         },
+      },
         `User filtered with ${JSON.stringify(query)} filter and pagination`,
       );
     } catch (error) {

@@ -16,15 +16,16 @@ import { getFailureResponse } from 'src/utils';
 import { UpdateUserDto } from './dto/update-userStat.dto';
 import { UpdateOnlineStatusDto } from './dto/update-onlinestatus.dto';
 import { Types } from 'mongoose';
+import { CreateUserStatDTO } from './dto/create-userstat.dto';
 
 @Controller('user-stats')
 export class UserStatsController {
   constructor(private readonly userstateService: UserStatsService) {}
   @UseGuards(AuthGuard, SessionGuard)
   @Post('create')
-  async create(@Body() userId: Types.ObjectId) {
+  async create(@Body() body:CreateUserStatDTO) {
     try {
-      return await this.userstateService.create(userId);
+      return await this.userstateService.create(body.userId);
     } catch (error) {
       if (error instanceof Error) return getFailureResponse(error.message);
       return getFailureResponse('An unknown error occurred');
@@ -48,12 +49,12 @@ export class UserStatsController {
   @UseGuards(AuthGuard, SessionGuard)
   @Put(':userId')
   async updateStats(
-    @Param('userId') id: Types.ObjectId,
+    @Param('userId') userId: string,
     @Body() updateUserStatDTO: UpdateUserDto,
   ) {
     try {
       const response = await this.userstateService.updateStats(
-        id,
+        userId,
         updateUserStatDTO.difficult,
         updateUserStatDTO.problemId,
       );

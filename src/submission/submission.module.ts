@@ -5,7 +5,7 @@ import { SubmissionController } from './submission.controller';
 import { SubmissionService } from './submission.service';
 import { AuthModule } from 'src/auth/auth.module';
 import { SessiontokenModule } from 'src/sessiontoken/sessiontoken.module';
-import { User } from 'src/Schemas/user.schema';
+import { User, Userschema } from 'src/Schemas/user.schema';
 import { UserStatsModule } from 'src/user_stats/user_stats.module';
 
 @Module({
@@ -13,7 +13,7 @@ import { UserStatsModule } from 'src/user_stats/user_stats.module';
     MongooseModule.forFeature([
       { name: Submission.name, schema: SubmissionSchema },
     ]),
-    MongooseModule.forFeature([{ name: User.name, schema: User }]),
+    MongooseModule.forFeature([{ name: User.name, schema: Userschema }]),
     AuthModule,
     SessiontokenModule,
     UserStatsModule,

@@ -342,9 +342,6 @@ Body: UpdateSubmissionDTO[]
 POST /leaderboard/recalculate
 Response: { jobId: "xxxx-xxxx-xxxx-xxxx" }
 
-# Track progress
-GET /jobs/:jobId
-Response: { status: "processing", progress: 45 }
 ```
 
 ### Pagination

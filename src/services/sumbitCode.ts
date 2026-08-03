@@ -18,7 +18,7 @@ async function submitCode(params: submitCodeArgs) {
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`error in submitcode of judge api ${error}`);
-    }
+    }else { throw error; }
   }
 }
 export default submitCode;

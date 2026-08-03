@@ -7,6 +7,7 @@ import {
   IsNumber,
   IsOptional,
 } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class CreateUserStatDTO {
   @ApiProperty({
@@ -16,107 +17,5 @@ export class CreateUserStatDTO {
   })
   @IsNotEmpty()
   @IsMongoId()
-  userId: string;
-
-  @ApiProperty({
-    type: Number,
-    description: 'Total points earned by the user (optional).',
-    example: 1200,
-    required: false,
-  })
-  @IsOptional()
-  @IsNumber()
-  totalPoints?: number;
-
-  @ApiProperty({
-    type: Number,
-    description: 'Number of easy problems solved by the user (optional).',
-    example: 30,
-    required: false,
-  })
-  @IsOptional()
-  @IsNumber()
-  easyProblems?: number;
-
-  @ApiProperty({
-    type: Number,
-    description: 'Number of medium problems solved by the user (optional).',
-    example: 20,
-    required: false,
-  })
-  @IsOptional()
-  @IsNumber()
-  mediumProblems?: number;
-
-  @ApiProperty({
-    type: Number,
-    description: 'Number of hard problems solved by the user (optional).',
-    example: 5,
-    required: false,
-  })
-  @IsOptional()
-  @IsNumber()
-  hardProblems?: number;
-
-  @ApiProperty({
-    type: Number,
-    description: 'Total number of problems solved by the user (optional).',
-    example: 55,
-    required: false,
-  })
-  @IsOptional()
-  @IsNumber()
-  totalSolved?: number;
-
-  @ApiProperty({
-    type: Number,
-    description: 'Current rank of the user (optional).',
-    example: 10,
-    required: false,
-  })
-  @IsOptional()
-  @IsNumber()
-  currentRank?: number;
-
-  @ApiProperty({
-    type: Number,
-    description: 'Previous rank of the user (optional).',
-    example: 12,
-    required: false,
-  })
-  @IsOptional()
-  @IsNumber()
-  previousRank?: number;
-
-  @ApiProperty({
-    type: String,
-    format: 'date-time',
-    description: 'Last updated timestamp (optional).',
-    example: '2024-07-26T12:34:56.789Z',
-    required: false,
-  })
-  @IsOptional()
-  @IsDate()
-  lastUpdated?: Date;
-
-  @ApiProperty({
-    type: Boolean,
-    description: 'Whether the user is currently online (optional).',
-    example: true,
-    required: false,
-  })
-  @IsOptional()
-  @IsBoolean()
-  isOnline?: boolean;
-
-  @ApiProperty({
-    type: String,
-    format: 'date-time',
-    description: 'Last seen timestamp (optional).',
-    example: '2024-07-25T18:00:00.000Z',
-    required: false,
-  })
-  @IsOptional()
-  @IsDate()
-  lastSeen?: Date;
+  userId: Types.ObjectId;
 }

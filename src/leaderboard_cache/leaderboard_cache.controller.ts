@@ -60,6 +60,9 @@ export class LeaderboardCacheController {
       );
       if (!result) {
         const stats = await this.userStatService.getAllUsersSorted();
+        if (!Array.isArray(stats)) {
+         return getFailureResponse('Failed to load leaderboard data');
+       }
         this.leaderBoardService.create(stats).catch((err) => {
           console.error('Failed to create cache:', err);
         });
@@ -148,7 +151,7 @@ export class LeaderboardCacheController {
     try {
       const userStats = await this.userStatService.findByUserId(userId);
 
-      if (!userStats || userStats.data.totalPoints === 0) {
+      if (!userStats?.data || userStats.data.totalPoints === 0) {
         return getSuccessResponse(
           {
             ranked: false,

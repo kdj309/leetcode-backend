@@ -12,7 +12,7 @@ async function batchwiseSubmission<T>(problems: T) {
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
-    }
+    }else { throw error; }
   }
 }
 

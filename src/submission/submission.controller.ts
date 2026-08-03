@@ -10,14 +10,16 @@ import {
   UseGuards,
   Query,
   ParseIntPipe,
+  Req,
 } from '@nestjs/common';
 import { SubmissionService } from './submission.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { SessionGuard } from 'src/sessiontoken/session.guard';
 import { CreateSubmissionDto } from './dto/create-submissiondto';
 import { getFailureResponse, getSuccessResponse } from 'src/utils';
-import { Types } from 'mongoose';
+import { ObjectId, Types } from 'mongoose';
 import { UpdateSubmissionDTO } from './dto/update-submissionstatusdto';
+import { Request as ExpressRequest } from 'express';
 
 
 @Controller()
@@ -38,7 +40,10 @@ export class SubmissionController {
       return submission;
     } catch (error) {
       console.log(error);
+      if (error instanceof Error) {
       return getFailureResponse(error.message);
+        
+      }
     }
   }
 
@@ -56,7 +61,10 @@ export class SubmissionController {
         );
       return submissionsResponses;
     } catch (error) {
+         if (error instanceof Error) {
       return getFailureResponse(error.message);
+        
+      }
     }
   }
 
@@ -91,16 +99,24 @@ export class SubmissionController {
         'Successfully updated the submission status',
       );
     } catch (error) {
+      if (error instanceof Error) {
       return getFailureResponse(error.message);
+        
+      }
     }
   }
 
   @UseGuards(AuthGuard, SessionGuard)
   @Put('batchupdate/submission')
-  async batchupdate(@Body() payload: UpdateSubmissionDTO[]) {
+  async batchupdate(
+    @Req() request: ExpressRequest & { user?: any },
+    @Body() payload: UpdateSubmissionDTO[],
+  ) {
     try {
-      const batchupdateResponse =
-        await this.submissionService.updateSubmissionsBatch(payload);
+      const batchupdateResponse = await this.submissionService.updateSubmissionsBatch(
+        payload,
+        request.user as ObjectId,
+      );
       return batchupdateResponse;
     } catch (error) {
       if (error instanceof Error) return getFailureResponse(error.message);

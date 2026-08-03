@@ -29,7 +29,6 @@
     "@nestjs/mongoose": "^10.0.10",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.4.2",
-    "@upstash/redis": "^1.35.3",
     "axios": "^1.11.0",
     "bcrypt": "^5.1.1",
     "bullmq": "^5.56.8",

@@ -343,7 +343,7 @@ Params: userId (ObjectId)
 Query:
   page: number (default: 1)
   limit: number (default: 20)
-  status?: 'ACCEPTED' | 'WRONG_ANSWER' | 'PENDING'
+  status?: 'ACCEPTED' | 'WRONG_ANSWER'
   problemId?: ObjectId
   languageId?: number
   sortBy?: string (default: 'submittedAt')

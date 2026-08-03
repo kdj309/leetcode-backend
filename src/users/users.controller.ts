@@ -97,10 +97,10 @@ export class UsersController {
         return usermessage;
       }
     } catch (error) {
-      return {
-        status: 'Failure',
-        error: error.message,
-      };
+            if (error instanceof Error) {
+      return getFailureResponse(error.message);
+        
+      }
     }
   }
 
@@ -113,7 +113,10 @@ export class UsersController {
     try {
       return await this.userSrvice.updateUser(id, updateUserBody);
     } catch (error) {
+            if (error instanceof Error) {
       return getFailureResponse(error.message);
+        
+      }
     }
   }
 
@@ -126,7 +129,10 @@ export class UsersController {
     try {
       return await this.userSrvice.addSubmission(id, newsubmission);
     } catch (error) {
+      if (error instanceof Error) {
       return getFailureResponse(error.message);
+        
+      }
     }
   }
 
