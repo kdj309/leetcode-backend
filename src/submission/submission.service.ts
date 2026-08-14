@@ -236,7 +236,7 @@ export class SubmissionService {
             data: [
               { $sort: { [sortBy]: sortDirection } },
               { $skip: skip },
-              { $limit: limit },
+              { $limit: safeLimit },
               {
                 $lookup: {
                   from: 'problems',
@@ -293,12 +293,12 @@ export class SubmissionService {
                   total: { $arrayElemAt: ['$metadata.totalSubmissions', 0] },
                 },
                 in: {
-                  page: page,
-                  limit: limit,
+                  page: safePage,
+                  limit: safeLimit,
                   totalSubmissions: '$$total',
-                  totalPages: { $ceil: { $divide: ['$$total', limit] } },
-                  hasNextPage: { $gt: ['$$total', page * limit] },
-                  hasPrevPage: { $gt: [page, 1] },
+                  totalPages: { $ceil: { $divide: ['$$total', safeLimit] } },
+                  hasNextPage: { $gt: ['$$total', safePage * safeLimit] },
+                  hasPrevPage: { $gt: [safePage, 1] },
                 },
               },
             },
@@ -311,8 +311,8 @@ export class SubmissionService {
         result[0] || {
           submissions: [],
           pagination: {
-            page,
-            limit,
+            page: safePage,
+            limit: safeLimit,
             totalSubmissions: 0,
             totalPages: 0,
             hasNextPage: false,

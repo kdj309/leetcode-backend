@@ -11,8 +11,10 @@ async function batchwiseSubmission<T>(problems: T) {
     return response.data;
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(error.message);
-    }else { throw error; }
+      throw error;
+    } else {
+      throw new Error(String(error));
+    }
   }
 }
 

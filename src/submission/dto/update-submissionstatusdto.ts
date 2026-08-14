@@ -9,6 +9,7 @@ import {
 import { Types } from 'mongoose';
 
 export class UpdateSubmissionDTO {
+  @IsMongoId()
   submissionId: Types.ObjectId;
 
   @ApiProperty({

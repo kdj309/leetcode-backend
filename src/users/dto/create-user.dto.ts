@@ -45,9 +45,9 @@ export class createUser {
   @ApiProperty({
     type: Number,
     description:
-      "The user's favorite programming language (required). Programming language id.",
+      "The user's favorite programming language (optional). Programming language id.",
     example: 50,
-    required:false
+    required: false,
   })
   @IsOptional()
   @IsEnum(supportedlanguages)
