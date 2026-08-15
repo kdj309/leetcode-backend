@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpException,
   NotFoundException,
   Param,
   Patch,
@@ -69,6 +70,7 @@ export class UserStatsController {
       );
       return response;
     } catch (error) {
+      if (error instanceof HttpException) throw error;
       if (error instanceof Error) return getFailureResponse(error.message);
       return getFailureResponse('An unknown error occurred');
     }
