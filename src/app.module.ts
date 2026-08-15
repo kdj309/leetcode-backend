@@ -8,6 +8,10 @@ import { config } from './config/config';
 import { AuthModule } from './auth/auth.module';
 import { RetrytokenModule } from './retrytoken/retrytoken.module';
 import { SessiontokenModule } from './sessiontoken/sessiontoken.module';
+import { SubmissionModule } from './submission/submission.module';
+import { UserStatsModule } from './user_stats/user_stats.module';
+import { LeaderboardCacheModule } from './leaderboard_cache/leaderboard_cache.module';
+import { QueueModule } from './queue/queue.module';
 
 @Module({
   imports: [
@@ -17,6 +21,10 @@ import { SessiontokenModule } from './sessiontoken/sessiontoken.module';
     RetrytokenModule,
     AuthModule,
     SessiontokenModule,
+    SubmissionModule,
+    UserStatsModule,
+    LeaderboardCacheModule,
+    QueueModule,
   ],
   controllers: [AppController],
   providers: [AppService],

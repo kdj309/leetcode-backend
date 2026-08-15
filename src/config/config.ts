@@ -15,4 +15,19 @@ export const config = (): ConfigProps => ({
       databaseName: process.env.NODE_ENV || 'local',
     },
   },
+  redis: {
+    url: process.env.REDIS_HOST,
+    password: process.env.REDIS_PASSWORD,
+    port: process.env.REDIS_PORT,
+  },
+  judge: {
+    url: process.env.JUDGEAPI_BASE_URL,
+    key: process.env.JUDGEAPI_API_KEY,
+    host: process.env.JUDGEAPI_HOST,
+  },
+  elasticsearch: {
+    node: process.env.ELASTICSEARCH_NODE,
+    username: process.env.ELASTICSEARCH_USERNAME,
+    password:process.env.ELASTICSEARCH_PASSWORD
+  },
 });

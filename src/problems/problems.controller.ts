@@ -8,6 +8,9 @@ import {
   Delete,
   NotFoundException,
   UseGuards,
+  Query,
+  ParseIntPipe,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { ProblemsService } from './problems.service';
 import { CreateProblemDto } from './dto/create-problem.dto';
@@ -17,7 +20,7 @@ import { Role } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGaurd } from 'src/roles/roles.guard';
 import { ObjectId } from 'mongoose';
-import { getFailureResponse } from 'src/utils';
+import { getFailureResponse, getSuccessResponse } from 'src/utils';
 import { SessionGuard } from 'src/sessiontoken/session.guard';
 
 @Controller('problems')
@@ -37,9 +40,12 @@ export class ProblemsController {
   }
 
   @Get()
-  async findAll() {
+  async findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ) {
     try {
-      return await this.problemsService.findAll();
+      return await this.problemsService.findAll(page, limit);
     } catch (error) {
       if (error instanceof Error) return getFailureResponse(error.message);
       return getFailureResponse('An unknown error occurred');
@@ -84,6 +90,21 @@ export class ProblemsController {
     } catch (error) {
       if (error instanceof Error) return getFailureResponse(error.message);
       return getFailureResponse('An unknown error occurred');
+    }
+  }
+
+  @Get('search/filters')
+  async searchProblems(
+    @Query('query') query?: string,
+    @Query('difficulty') difficulty?: string,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+  ) {
+    try {
+      const results = await this.problemsService.searchProblems(page, limit, query, difficulty);
+      return results;
+    } catch (error) {
+      if (error instanceof Error) return getFailureResponse(error.message);
     }
   }
 }

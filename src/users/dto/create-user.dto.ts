@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsNotEmpty, MinLength } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
 import { Role } from 'src/enums/roles.enum';
 import { supportedlanguages } from 'src/interfaces/config.interface';
 
@@ -45,9 +45,11 @@ export class createUser {
   @ApiProperty({
     type: Number,
     description:
-      "The user's favorite programming language (required). Programming language id.",
+      "The user's favorite programming language (optional). Programming language id.",
     example: 50,
+    required: false,
   })
+  @IsOptional()
   @IsEnum(supportedlanguages)
-  favoriteProgrammingLanguage: number;
+  favoriteProgrammingLanguage?: number;
 }
