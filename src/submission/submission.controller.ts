@@ -11,6 +11,7 @@ import {
   Query,
   ParseIntPipe,
   Req,
+  ParseArrayPipe,
 } from '@nestjs/common';
 import { SubmissionService } from './submission.service';
 import { AuthGuard } from 'src/auth/auth.guard';
@@ -110,7 +111,8 @@ export class SubmissionController {
   @Put('batchupdate/submission')
   async batchupdate(
     @Req() request: ExpressRequest & { user?: any },
-    @Body() payload: UpdateSubmissionDTO[],
+    @Body(new ParseArrayPipe({ items: UpdateSubmissionDTO }))
+    payload: UpdateSubmissionDTO[],
   ) {
     try {
       const batchupdateResponse = await this.submissionService.updateSubmissionsBatch(

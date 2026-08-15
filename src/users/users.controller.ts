@@ -97,9 +97,8 @@ export class UsersController {
         return usermessage;
       }
     } catch (error) {
-            if (error instanceof Error) {
-      return getFailureResponse(error.message);
-        
+      if (error instanceof Error) {
+        return getFailureResponse(error.message);
       }
     }
   }
@@ -113,9 +112,8 @@ export class UsersController {
     try {
       return await this.userSrvice.updateUser(id, updateUserBody);
     } catch (error) {
-            if (error instanceof Error) {
-      return getFailureResponse(error.message);
-        
+      if (error instanceof Error) {
+        return getFailureResponse(error.message);
       }
     }
   }
@@ -130,8 +128,7 @@ export class UsersController {
       return await this.userSrvice.addSubmission(id, newsubmission);
     } catch (error) {
       if (error instanceof Error) {
-      return getFailureResponse(error.message);
-        
+        return getFailureResponse(error.message);
       }
     }
   }
