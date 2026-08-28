@@ -27,4 +27,3 @@ describe('LeaderboardEventsService', () => {
     subscription.unsubscribe();
   });
 });
-

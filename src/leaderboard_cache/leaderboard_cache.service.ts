@@ -63,7 +63,7 @@ export class LeaderboardCacheService {
       pipeline.del(this.CACHE_KEYS.GLOBAL_LEADERBOARD);
       pipeline.del(this.CACHE_KEYS.USER_RANKINGS);
       pipeline.del(this.CACHE_KEYS.LAST_UPDATE);
-      const results = await pipeline.exec();
+      await pipeline.exec();
 
       await this.LeadboardCacheModule.updateOne(
         { cacheKey: this.CACHE_KEYS.GLOBAL_LEADERBOARD },
@@ -71,7 +71,8 @@ export class LeaderboardCacheService {
       );
       console.log('✅ Cache invalidated successfully');
     } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`Failed to invalidate cache: ${errorMessage}`);
     }
   }

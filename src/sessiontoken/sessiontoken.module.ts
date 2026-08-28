@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { SessionToken, SessionTokenSchema } from 'src/Schemas/session.schema';
 import { SessiontokenController } from './sessiontoken.controller';

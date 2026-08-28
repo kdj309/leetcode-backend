@@ -32,8 +32,7 @@ export class AuthService {
       if (previoustoken) {
         refreshtoken = previoustoken.token;
       } else {
-        //@ts-ignore
-        refreshtoken = await this.retryService.createToken(user._id);
+        refreshtoken = await this.retryService.createToken(user);
       }
       const payload = { sub: user.id, username: user.username };
       const token = await this.jwtService.signAsync(payload, {
@@ -74,7 +73,6 @@ export class AuthService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      //@ts-ignore
       const isExpired = await this.retryService.validateExpiry(refreshToken);
 
       if (isExpired) {
@@ -84,7 +82,6 @@ export class AuthService {
           HttpStatus.NOT_FOUND,
         );
       }
-      //@ts-ignore
       const payload = {
         sub: refreshToken.userId,
         username: refreshToken.userId.username,
@@ -110,7 +107,7 @@ export class AuthService {
       await this.sessionService.invalidateSession(token);
       return;
     } catch (error) {
-      throw error.message;
+      throw error;
     }
   }
   async validateToken(token: string) {

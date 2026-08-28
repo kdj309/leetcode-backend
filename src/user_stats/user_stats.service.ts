@@ -6,7 +6,7 @@ import { Model, Types } from 'mongoose';
 import { LeaderboardJobs } from 'src/interfaces/config.interface';
 import { Submission } from 'src/Schemas/submission.schema';
 import { User } from 'src/Schemas/user.schema';
-import { UserStat } from 'src/Schemas/userstat.schema';
+import { UserStat, UserStatLean } from 'src/Schemas/userstat.schema';
 import { getSuccessResponse } from 'src/utils';
 
 @Injectable()
@@ -126,7 +126,7 @@ export class UserStatsService {
         },
       );
       console.log('Update Stats Response:', response);
-      return response;  
+      return response;
     } catch (error) {
       if (error instanceof Error)
         throw new Error(
@@ -182,14 +182,13 @@ export class UserStatsService {
         );
     }
   }
-  async updateRanksBatch(users: UserStat[], startIndex: number) {
+  async updateRanksBatch(users: UserStatLean[], startIndex: number) {
     try {
       const bulkOps = users.map((u, idx) => {
         const newRank = startIndex + idx + 1;
 
         return {
           updateOne: {
-            //@ts-ignore
             filter: { _id: u._id },
             update: {
               $set: {
@@ -296,28 +295,28 @@ export class UserStatsService {
       const limit = filters.limit || 50;
       const skip = (page - 1) * limit;
 
- const [users, totalUsers] = await Promise.all([
-      this.userStatModule
-         .find(query)
-         .sort({ totalPoints: -1 })
-        .skip(skip)
-        .limit(limit)
-       .lean(),
-    this.userStatModule.countDocuments(query),
-   ]);
+      const [users, totalUsers] = await Promise.all([
+        this.userStatModule
+          .find(query)
+          .sort({ totalPoints: -1 })
+          .skip(skip)
+          .limit(limit)
+          .lean(),
+        this.userStatModule.countDocuments(query),
+      ]);
 
       return getSuccessResponse(
         {
-        users,
-      pagination: {
-      page,
-      limit,
+          users,
+          pagination: {
+            page,
+            limit,
             totalUsers,
-    totalPages: Math.ceil(totalUsers / limit),
-           hasNextPage: skip + users.length < totalUsers,
-           hasPrevPage: page > 1,
-         },
-      },
+            totalPages: Math.ceil(totalUsers / limit),
+            hasNextPage: skip + users.length < totalUsers,
+            hasPrevPage: page > 1,
+          },
+        },
         `User filtered with ${JSON.stringify(query)} filter and pagination`,
       );
     } catch (error) {

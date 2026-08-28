@@ -61,7 +61,7 @@ export class SubmissionService {
         userId,
         submissionId: judgeResponses.map((r) => r.token),
         submittedAt: new Date(),
-        actual_output: submissions.map((s) => ''),
+        actual_output: submissions.map(() => ''),
         executionTime: 0,
         memoryUsed: 0,
       });
@@ -119,7 +119,7 @@ export class SubmissionService {
         );
       }
       const updatedSubmission = await this.submissionModule.findByIdAndUpdate(
-        {_id:submissionId,userId},
+        { _id: submissionId, userId },
         {
           $set: {
             status: updateBody.status.toUpperCase(),
@@ -138,7 +138,10 @@ export class SubmissionService {
     }
   }
 
-  async updateSubmissionsBatch(batchUpdateBody: IBatchSubmissionDTO[],userId:ObjectId) {
+  async updateSubmissionsBatch(
+    batchUpdateBody: IBatchSubmissionDTO[],
+    userId: ObjectId,
+  ) {
     try {
       const bulkOperations = batchUpdateBody.map((update) => ({
         updateOne: {

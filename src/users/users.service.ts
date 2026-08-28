@@ -24,10 +24,9 @@ export class UsersService {
   }
 
   async getUser(id: Types.ObjectId) {
-    const user = await this.userModel.findById(
-      id,
-      '-_password -hashedpassword',
-    ).populate('submissions');
+    const user = await this.userModel
+      .findById(id, '-_password -hashedpassword')
+      .populate('submissions');
     if (user) {
       return getSuccessResponse(user, 'Successfully fetched the problem');
     } else {
@@ -51,10 +50,7 @@ export class UsersService {
         const payload = { sub: newuser.id, username: newuser.username };
         await newuser.save();
         const sessiontoken = await this.sessionService.createToken(newuser._id);
-        const refreshtoken = await this.retryTokenService.createToken(
-          //@ts-ignore
-          newuser._id,
-        );
+        const refreshtoken = await this.retryTokenService.createToken(newuser);
         return getSuccessResponse(
           {
             access_token: await this.jwtService.signAsync(payload),

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
-import { User } from './user.schema';
+import { UserDocument } from './user.schema';
 
 @Schema({ timestamps: true })
 export class SessionToken {
@@ -8,7 +8,7 @@ export class SessionToken {
   token: string;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-  userId: User;
+  userId: UserDocument;
 
   @Prop()
   expiryDate: Date;

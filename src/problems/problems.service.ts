@@ -39,8 +39,20 @@ interface ESMultiMatchQuery {
     boost?: number;
   };
 }
+interface ESMatchBoolPrefixQuery {
+  match_bool_prefix?: {
+    title?: {
+      query: string;
+      boost: number;
+    };
+  };
+}
 
-type ESShouldClause = ESMatchPhraseQuery | ESMatchQuery | ESMultiMatchQuery;
+type ESShouldClause =
+  | ESMatchPhraseQuery
+  | ESMatchQuery
+  | ESMultiMatchQuery
+  | ESMatchBoolPrefixQuery;
 
 interface ESBoolQuery {
   should?: ESShouldClause[];
@@ -52,7 +64,7 @@ interface ESBoolQuery {
 export class ProblemsService {
   constructor(
     @InjectModel(Problem.name) private problemModule: Model<Problem>,
-  ) { }
+  ) {}
   async create(createProblemDto: CreateProblemDto) {
     try {
       const problem = new this.problemModule(createProblemDto);
@@ -66,7 +78,7 @@ export class ProblemsService {
     return 'Problem saved successfully';
   }
 
-  async findAll(page: number = 1, limit: number = 10) {
+  async findAll(page = 1, limit = 10) {
     try {
       // Validate pagination parameters
       const pageNum = Math.max(1, Number(page) || 1);
@@ -84,7 +96,6 @@ export class ProblemsService {
         )
         .skip(skip)
         .limit(limitNum);
-
 
       return getSuccessResponse(
         {
@@ -146,7 +157,12 @@ export class ProblemsService {
         throw new Error(`error in problem remove method ${error.message}`);
     }
   }
-  async searchProblems(page: number, limit: number, query?: string, difficulty?: string,) {
+  async searchProblems(
+    page: number,
+    limit: number,
+    query?: string,
+    difficulty?: string,
+  ) {
     try {
       if (!query && !difficulty) {
         const problems = await this.problemModule
@@ -161,7 +177,7 @@ export class ProblemsService {
       const filters: ESFilterClause[] = [];
       if (difficulty) {
         filters.push({
-          term: { difficulty: difficulty.toLowerCase() }
+          term: { difficulty: difficulty.toLowerCase() },
         });
       }
 
@@ -172,9 +188,18 @@ export class ProblemsService {
           match_phrase: {
             title: {
               query,
-              boost: 20
-            }
-          }
+              boost: 20,
+            },
+          },
+        });
+
+        shouldClauses.push({
+          match_bool_prefix: {
+            title: {
+              query,
+              boost: 15,
+            },
+          },
         });
 
         shouldClauses.push({
@@ -182,11 +207,10 @@ export class ProblemsService {
             title: {
               query,
               boost: 10,
-              operator: 'and'
-            }
-          }
+              operator: 'and',
+            },
+          },
         });
-
       }
 
       // Build the bool query
@@ -199,20 +223,28 @@ export class ProblemsService {
         boolQuery.filter = filters;
       }
 
-
       const response = await elasticSearchClient.search({
         index: 'problems_v3',
         from: (page - 1) * limit,
         size: limit,
-        query: Object.keys(boolQuery).length > 0 ? { bool: boolQuery } : { match_all: {} }
-
+        query:
+          Object.keys(boolQuery).length > 0
+            ? { bool: boolQuery }
+            : { match_all: {} },
       });
 
       const hits = response.hits.hits;
-      const totalResults = typeof response.hits.total === 'number' ? response.hits.total : response.hits.total.value;
-      return getSuccessResponse({ results: hits, total: totalResults }, 'Search completed successfully');
+      const totalResults =
+        typeof response.hits.total === 'number'
+          ? response.hits.total
+          : response.hits.total.value;
+      return getSuccessResponse(
+        { results: hits, total: totalResults },
+        'Search completed successfully',
+      );
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
       throw new Error(`[searchProblems] ${errorMessage}`);
     }
   }

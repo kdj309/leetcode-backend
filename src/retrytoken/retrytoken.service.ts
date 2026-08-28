@@ -1,18 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
-import { Retrytoken } from 'src/Schemas/retrytoken.schema';
-import { User } from 'src/Schemas/user.schema';
+import mongoose from 'mongoose';
+import {
+  Retrytoken,
+  RetrytokenDocument,
+  RetrytokenModel,
+} from 'src/Schemas/retrytoken.schema';
+import { UserDocument } from 'src/Schemas/user.schema';
 
 @Injectable()
 export class RetrytokenService {
   constructor(
-    @InjectModel(Retrytoken.name) private retryModule: Model<Retrytoken>,
+    @InjectModel(Retrytoken.name) private retryModule: RetrytokenModel,
   ) {}
 
-  async createToken(user: User) {
+  async createToken(user: UserDocument) {
     try {
-      //@ts-ignore
       return this.retryModule.generateToken(user);
     } catch (error) {
       throw error;
@@ -38,9 +41,8 @@ export class RetrytokenService {
       throw error;
     }
   }
-  async validateExpiry(token: Retrytoken) {
+  async validateExpiry(token: RetrytokenDocument) {
     try {
-      //@ts-ignore
       const refreshtoken = this.retryModule.verifyExpiry(token);
       return refreshtoken;
     } catch (error) {

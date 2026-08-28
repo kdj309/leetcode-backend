@@ -181,7 +181,7 @@ export class LeaderboardCacheController {
         'User position retrieved',
       );
     } catch (error) {
-      if (error instanceof Error) return getFailureResponse(error.message)
+      if (error instanceof Error) return getFailureResponse(error.message);
     }
   }
 
@@ -216,7 +216,9 @@ export class LeaderboardCacheController {
 
       return getSuccessResponse(
         paginatedResult,
-        `User filtered with ${userName ? `user name ${userName}` : 'filters'} and ${period || 'all'} period`,
+        `User filtered with ${
+          userName ? `user name ${userName}` : 'filters'
+        } and ${period || 'all'} period`,
       );
     } catch (error) {
       if (error instanceof Error) return getFailureResponse(error.message);
