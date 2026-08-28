@@ -1,6 +1,6 @@
 /**
  * Elasticsearch Client Singleton Pattern
- * 
+ *
  * Explicit singleton implementation for better control and clarity
  * Ensures only ONE instance of ElasticsearchClient is created across the entire application
  */
@@ -17,19 +17,26 @@ class ElasticsearchClientSingleton {
    */
   public static getInstance(): Client {
     if (!ElasticsearchClientSingleton.instance) {
-      console.log('[ElasticsearchClient] Initializing singleton instance...',config().elasticsearch.node);
-      
+      console.log(
+        '[ElasticsearchClient] Initializing singleton instance...',
+        config().elasticsearch.node,
+      );
+
       ElasticsearchClientSingleton.instance = new Client({
         node: config().elasticsearch.node,
         auth: {
-              username: config().elasticsearch.username,
-              password: config().elasticsearch.password,
+          username: config().elasticsearch.username,
+          password: config().elasticsearch.password,
         },
       });
 
-      console.log('[ElasticsearchClient] Singleton instance created successfully');
+      console.log(
+        '[ElasticsearchClient] Singleton instance created successfully',
+      );
     } else {
-      console.log('[ElasticsearchClient] Returning existing singleton instance');
+      console.log(
+        '[ElasticsearchClient] Returning existing singleton instance',
+      );
     }
 
     return ElasticsearchClientSingleton.instance;

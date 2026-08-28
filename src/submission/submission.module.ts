@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Submission, SubmissionSchema } from 'src/Schemas/submission.schema';
 import { SubmissionController } from './submission.controller';
@@ -22,6 +22,4 @@ import { UserStatsModule } from 'src/user_stats/user_stats.module';
   providers: [SubmissionService],
   exports: [SubmissionService],
 })
-export class SubmissionModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {}
-}
+export class SubmissionModule {}

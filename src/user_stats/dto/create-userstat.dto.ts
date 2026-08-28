@@ -1,12 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsBoolean,
-  IsDate,
-  IsMongoId,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-} from 'class-validator';
+import { IsMongoId, IsNotEmpty } from 'class-validator';
 import { Types } from 'mongoose';
 
 export class CreateUserStatDTO {

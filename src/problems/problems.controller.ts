@@ -20,7 +20,7 @@ import { Role } from 'src/enums/roles.enum';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { RolesGaurd } from 'src/roles/roles.guard';
 import { ObjectId } from 'mongoose';
-import { getFailureResponse, getSuccessResponse } from 'src/utils';
+import { getFailureResponse } from 'src/utils';
 import { SessionGuard } from 'src/sessiontoken/session.guard';
 
 @Controller('problems')
@@ -97,11 +97,16 @@ export class ProblemsController {
   async searchProblems(
     @Query('query') query?: string,
     @Query('difficulty') difficulty?: string,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 10,
   ) {
     try {
-      const results = await this.problemsService.searchProblems(page, limit, query, difficulty);
+      const results = await this.problemsService.searchProblems(
+        page,
+        limit,
+        query,
+        difficulty,
+      );
       return results;
     } catch (error) {
       if (error instanceof Error) return getFailureResponse(error.message);

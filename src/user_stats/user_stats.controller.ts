@@ -18,7 +18,6 @@ import { SessionGuard } from 'src/sessiontoken/session.guard';
 import { getFailureResponse } from 'src/utils';
 import { UpdateUserDto } from './dto/update-userStat.dto';
 import { UpdateOnlineStatusDto } from './dto/update-onlinestatus.dto';
-import { Types } from 'mongoose';
 import { CreateUserStatDTO } from './dto/create-userstat.dto';
 import { Request as ExpressRequest } from 'express';
 
@@ -27,7 +26,7 @@ export class UserStatsController {
   constructor(private readonly userstateService: UserStatsService) {}
   @UseGuards(AuthGuard, SessionGuard)
   @Post('create')
-  async create(@Body() body:CreateUserStatDTO) {
+  async create(@Body() body: CreateUserStatDTO) {
     try {
       return await this.userstateService.create(body.userId);
     } catch (error) {

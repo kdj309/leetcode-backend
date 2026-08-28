@@ -39,10 +39,10 @@ export class LeaderboardProcessor extends WorkerHost {
       }
     } catch (error) {
       if (error instanceof Error) {
-              this.logger.error(
-        `Job ${job.name} failed: ${error.message}`,
-        error.stack,
-      );
+        this.logger.error(
+          `Job ${job.name} failed: ${error.message}`,
+          error.stack,
+        );
       }
 
       throw error;
@@ -53,7 +53,6 @@ export class LeaderboardProcessor extends WorkerHost {
     job.updateProgress(10);
     const users = await this.userStatsService.getAllUsersSorted(false);
     job.updateProgress(30);
-    let cachedUserStats;
     const batchSize = 100;
     for (let i = 0; i < users.length; i += batchSize) {
       const batch = users.slice(i, i + batchSize);
@@ -76,7 +75,7 @@ export class LeaderboardProcessor extends WorkerHost {
     this.logger.log('Creating fresh cache...');
     try {
       const freshUsers = await this.userStatsService.getAllUsersSorted();
-      cachedUserStats=await this.leaderboardCacheService.create(freshUsers);
+      await this.leaderboardCacheService.create(freshUsers);
       this.logger.log('✅ Fresh cache created successfully');
     } catch (cacheError) {
       this.logger.error('❌ Failed to create cache:', cacheError);
@@ -89,7 +88,7 @@ export class LeaderboardProcessor extends WorkerHost {
         message: `Updated ranks for ${users.length} users`,
         timestamp: new Date(),
         usersCount: users.length,
-        data:users,
+        data: users,
         triggeredBy: job.data?.triggeredBy,
         reason: job.data?.reason,
       },
@@ -126,8 +125,7 @@ export class LeaderboardProcessor extends WorkerHost {
       return payload.data;
     } catch (error) {
       if (error instanceof Error) {
-      throw new Error(`Failed to update leaderboard cache: ${error.message}`);
-        
+        throw new Error(`Failed to update leaderboard cache: ${error.message}`);
       }
     }
   }

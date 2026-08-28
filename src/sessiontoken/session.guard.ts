@@ -8,6 +8,10 @@ import {
 import { Request } from 'express';
 import { AuthService } from 'src/auth/auth.service';
 
+interface RequestWithUser extends Request {
+  user: string;
+}
+
 @Injectable()
 export class SessionGuard implements CanActivate {
   constructor(private authService: AuthService) {}
@@ -23,8 +27,7 @@ export class SessionGuard implements CanActivate {
       const token = await this.authService.validateToken(
         sessiontoken as string,
       );
-      //@ts-ignore
-      request.user = token.userId;
+      (request as RequestWithUser).user = token.userId._id.toString();
       return true;
     } catch (error) {
       throw new HttpException('Session Expired', 440);

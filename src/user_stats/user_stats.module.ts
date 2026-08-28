@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserStat, UserStatSchema } from 'src/Schemas/userstat.schema';
 import { UserStatsController } from './user_stats.controller';
@@ -31,6 +31,4 @@ import { User, Userschema } from 'src/Schemas/user.schema';
   providers: [UserStatsService],
   exports: [UserStatsService],
 })
-export class UserStatsModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {}
-}
+export class UserStatsModule {}

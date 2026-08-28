@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Types } from 'mongoose';
-import { User } from './user.schema';
 
 @Schema({ timestamps: true })
 export class UserStat {
@@ -45,6 +44,8 @@ export class UserStat {
   @Prop({ type: Date, default: Date.now })
   lastSeen: Date;
 }
+export type UserStatLean = UserStat & { _id: Types.ObjectId };
+export type UserStatDocument = mongoose.HydratedDocument<UserStat>;
 export const UserStatSchema = SchemaFactory.createForClass(UserStat);
 UserStatSchema.index({ userName: 1 });
 UserStatSchema.index({ lastUpdated: 1 });

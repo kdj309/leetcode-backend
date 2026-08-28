@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { RetrytokenController } from './retrytoken.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Retrytoken, RetryTokenSchema } from 'src/Schemas/retrytoken.schema';
@@ -14,6 +14,4 @@ import { RetrytokenService } from './retrytoken.service';
   providers: [RetrytokenService],
   exports: [RetrytokenService],
 })
-export class RetrytokenModule implements NestModule {
-  configure(_: MiddlewareConsumer) {}
-}
+export class RetrytokenModule {}

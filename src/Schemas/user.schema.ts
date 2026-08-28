@@ -4,7 +4,6 @@ import * as mongoose from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import { Role } from 'src/enums/roles.enum';
 import { supportedlanguages } from 'src/interfaces/config.interface';
-import { Submission } from './submission.schema';
 export type UserDocument = HydratedDocument<User>;
 
 @Schema()

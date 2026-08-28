@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
   LeadBoardCache,
@@ -26,9 +26,11 @@ import { LeaderboardEventsService } from './leaderboard_events.service';
     SubmissionModule,
   ],
   controllers: [LeaderboardCacheController],
-  providers: [LeaderboardCacheService, LeaderboardProcessor, LeaderboardEventsService],
+  providers: [
+    LeaderboardCacheService,
+    LeaderboardProcessor,
+    LeaderboardEventsService,
+  ],
   exports: [LeaderboardCacheService],
 })
-export class LeaderboardCacheModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {}
-}
+export class LeaderboardCacheModule {}

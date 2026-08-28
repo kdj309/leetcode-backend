@@ -22,7 +22,6 @@ import { ObjectId, Types } from 'mongoose';
 import { UpdateSubmissionDTO } from './dto/update-submissionstatusdto';
 import { Request as ExpressRequest } from 'express';
 
-
 @Controller()
 export class SubmissionController {
   constructor(private readonly submissionService: SubmissionService) {}
@@ -42,8 +41,7 @@ export class SubmissionController {
     } catch (error) {
       console.log(error);
       if (error instanceof Error) {
-      return getFailureResponse(error.message);
-        
+        return getFailureResponse(error.message);
       }
     }
   }
@@ -62,9 +60,8 @@ export class SubmissionController {
         );
       return submissionsResponses;
     } catch (error) {
-         if (error instanceof Error) {
-      return getFailureResponse(error.message);
-        
+      if (error instanceof Error) {
+        return getFailureResponse(error.message);
       }
     }
   }
@@ -101,8 +98,7 @@ export class SubmissionController {
       );
     } catch (error) {
       if (error instanceof Error) {
-      return getFailureResponse(error.message);
-        
+        return getFailureResponse(error.message);
       }
     }
   }
@@ -115,10 +111,11 @@ export class SubmissionController {
     payload: UpdateSubmissionDTO[],
   ) {
     try {
-      const batchupdateResponse = await this.submissionService.updateSubmissionsBatch(
-        payload,
-        request.user as ObjectId,
-      );
+      const batchupdateResponse =
+        await this.submissionService.updateSubmissionsBatch(
+          payload,
+          request.user as ObjectId,
+        );
       return batchupdateResponse;
     } catch (error) {
       if (error instanceof Error) return getFailureResponse(error.message);

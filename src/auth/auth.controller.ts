@@ -9,7 +9,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { signInDto } from './dto/signin-user.dto';
+import { signInDto as signInDtoType } from './dto/signin-user.dto';
 import { getSuccessResponse } from 'src/utils';
 import { Response, Request } from 'express';
 
@@ -20,7 +20,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   async signIn(
-    @Body() signInDto: signInDto,
+    @Body() signInDto: signInDtoType,
     @Res({ passthrough: true }) response: Response,
   ) {
     try {
@@ -76,7 +76,8 @@ export class AuthController {
       delete authresponse.data.sessiontoken;
       return authresponse;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Sign in failed';
+      const errorMessage =
+        error instanceof Error ? error.message : 'Sign in failed';
       return {
         status: 'Failure',
         error: errorMessage,
@@ -189,11 +190,9 @@ export class AuthController {
         throw error;
       }
 
-      const errorMessage = error instanceof Error ? error.message : 'Token refresh failed';
-      throw new HttpException(
-        errorMessage,
-        HttpStatus.BAD_REQUEST,
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : 'Token refresh failed';
+      throw new HttpException(errorMessage, HttpStatus.BAD_REQUEST);
     }
   }
 
