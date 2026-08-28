@@ -30,6 +30,7 @@ export class SessionGuard implements CanActivate {
       (request as RequestWithUser).user = token.userId._id.toString();
       return true;
     } catch (error) {
+      console.error('Error validating session token:', error);
       throw new HttpException('Session Expired', 440);
     }
   }
