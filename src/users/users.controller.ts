@@ -56,10 +56,6 @@ export class UsersController {
         response.cookie('access-token', usermessage.data?.access_token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          domain:
-            process.env.NODE_ENV === 'production'
-              ? process.env.DOMAIN
-              : 'localhost',
           path: '/',
           sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         });
@@ -73,20 +69,12 @@ export class UsersController {
         response.cookie('id', usermessage.data.id, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          domain:
-            process.env.NODE_ENV === 'production'
-              ? process.env.DOMAIN
-              : 'localhost',
           path: '/',
           sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         });
         response.cookie('refresh-token', usermessage.data.refreshtoken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
-          domain:
-            process.env.NODE_ENV === 'production'
-              ? process.env.DOMAIN
-              : 'localhost',
           path: '/',
           maxAge: 7 * 24 * 60 * 60 * 1000,
           sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
