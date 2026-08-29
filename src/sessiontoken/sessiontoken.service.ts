@@ -24,32 +24,6 @@ export class SessiontokenService {
     }
   }
   async validateSession(token: string): Promise<SessionToken | null> {
-      // ✅ Add these critical logs
-  console.log('=== SESSION DEBUG ===');
-  console.log('Token received (raw):', token);
-  console.log('Token length:', token?.length);
-  console.log('Token type:', typeof token);
-  
-  // Check if ANY sessions exist
-  const totalSessions = await this.sessionModel.countDocuments();
-  console.log('Total sessions in DB:', totalSessions);
-  
-  // Try to find token without ANY filter
-  const allSessions = await this.sessionModel.find({}).lean();
-  console.log('All sessions:', JSON.stringify(allSessions, null, 2));
-  
-  // Try exact token match only (no date filter)
-  const sessionByToken = await this.sessionModel
-    .findOne({ token })
-    .lean();
-  console.log('Session by token only:', sessionByToken);
-  
-  // Try date filter separately
-  if (sessionByToken) {
-    console.log('ExpiryDate in DB:', sessionByToken.expiryDate);
-    console.log('Current time:', new Date());
-    console.log('Is still valid?:', new Date(sessionByToken.expiryDate) > new Date());
-  }
     const response = await this.sessionModel
       .findOne({ token, expiryDate: { $gt: new Date() } })
       .populate({
