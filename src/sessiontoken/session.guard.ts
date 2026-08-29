@@ -27,8 +27,9 @@ export class SessionGuard implements CanActivate {
       const token = await this.authService.validateToken(
         sessiontoken as string,
       );
+      console.log('Session token validated successfully:', token);
       (request as RequestWithUser).user = token.userId._id.toString();
-      return true;
+      return true;    
     } catch (error) {
       console.error('Error validating session token:', error);
       throw new HttpException('Session Expired', 440);

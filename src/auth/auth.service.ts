@@ -112,6 +112,7 @@ export class AuthService {
   }
   async validateToken(token: string) {
     const session = await this.sessionService.validateSession(token);
+    console.log('Session validation result:', session);
     if (!session) {
       throw new UnauthorizedException('Invalid session');
     }

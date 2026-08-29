@@ -31,6 +31,7 @@ export class SessiontokenService {
         select: '-hashedpassword',
         populate: { path: 'submissions' },
       });
+    console.log('Session validation response:', response);
     return response;
   }
 
