@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from 'src/auth/auth.service';
+import { getLatestCookieValue } from 'src/utils';
 
 interface RequestWithUser extends Request {
   user: string;
@@ -17,7 +18,7 @@ export class SessionGuard implements CanActivate {
   constructor(private authService: AuthService) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request: Request = context.switchToHttp().getRequest();
-    const sessiontoken = request.cookies['session-token'];
+    const sessiontoken = getLatestCookieValue(request.cookies, 'session-token');
     if (!sessiontoken) {
       throw new UnauthorizedException(
         'You are not logged in. Please log in to continue.',

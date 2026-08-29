@@ -10,12 +10,12 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { signInDto as signInDtoType } from './dto/signin-user.dto';
-import { getSuccessResponse } from 'src/utils';
+import { getLatestCookieValue, getSuccessResponse } from 'src/utils';
 import { Response, Request } from 'express';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
@@ -106,7 +106,7 @@ export class AuthController {
   @Post('refresh')
   async createRefreshToken(@Req() request: Request, @Res() response: Response) {
     try {
-      const refreshToken = request.cookies['refresh-token'];
+      const refreshToken=getLatestCookieValue(request.cookies, 'refresh-token');
       if (!refreshToken) {
         throw new HttpException(
           'Refresh Token is required!',
@@ -116,6 +116,7 @@ export class AuthController {
       const newtokenresponse = await this.authService.verifyAndGenerateNewToken(
         refreshToken,
       );
+      const sessionToken = getLatestCookieValue(request.cookies, 'session-token');
       response.cookie('refresh-token', newtokenresponse.data.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -130,7 +131,7 @@ export class AuthController {
         path: '/',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       });
-      response.cookie('session-token', request.cookies['session-token'], {
+      response.cookie('session-token', sessionToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         path: '/',
@@ -155,8 +156,9 @@ export class AuthController {
   @Post('/session/validation')
   async sessionValidation(@Req() request: Request) {
     try {
-      const sessionToken = request.cookies['session-token'] as string;
-      const token = await this.authService.validateToken(sessionToken);
+      // Inside your SessionGuard or AuthService validateToken logic:
+      const rawSessionToken = getLatestCookieValue(request.cookies, 'session-token');
+      const token = await this.authService.validateToken(rawSessionToken);
       if (token) {
         return getSuccessResponse(
           { isExpired: false, user: token.userId },

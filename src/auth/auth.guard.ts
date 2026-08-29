@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
+import { getLatestCookieValue } from 'src/utils';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -13,7 +14,7 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = request.cookies['access-token'];
+    const token= getLatestCookieValue(request.cookies, 'access-token');
     if (!token) {
       throw new UnauthorizedException(
         'You are not logged in. Please log in to continue.',
