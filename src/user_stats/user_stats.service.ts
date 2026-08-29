@@ -35,6 +35,7 @@ export class UserStatsService {
     };
   }
   async create(userId: Types.ObjectId) {
+    const user = await this.userModule.findById(userId, 'username');
     const defaultStats = {
       userId,
       totalPoints: 0,
@@ -47,6 +48,7 @@ export class UserStatsService {
       isOnline: false,
       lastSeen: new Date(),
       lastUpdated: new Date(),
+      userName: user.username,
     };
     try {
       const existingStats = await this.userStatModule.findOne({ userId });
