@@ -7,7 +7,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 dotenv.config();
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.use(cookieParser());
+  app.use(cookieParser);
   app.enableCors({
     origin: process.env.FRONTEND_ORIGIN
       ? process.env.FRONTEND_ORIGIN
