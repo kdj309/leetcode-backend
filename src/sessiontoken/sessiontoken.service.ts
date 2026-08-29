@@ -25,7 +25,7 @@ export class SessiontokenService {
   }
   async validateSession(token: string): Promise<SessionToken | null> {
     const response = await this.sessionModel
-      .findOne({ token, expiryDate: { $gt: new Date().toISOString() } })
+      .findOne({ token, expiryDate: { $gt: new Date() } })
       .populate({
         path: 'userId',
         select: '-hashedpassword',
