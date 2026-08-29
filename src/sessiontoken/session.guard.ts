@@ -27,7 +27,6 @@ export class SessionGuard implements CanActivate {
       const token = await this.authService.validateToken(
         sessiontoken as string,
       );
-      console.log('Session token validated successfully:', token);
       (request as RequestWithUser).user = token.userId._id.toString();
       return true;    
     } catch (error) {
